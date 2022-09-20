@@ -19,7 +19,7 @@ public class EventClient extends BaseClient {
     private String appName;
 
     @Autowired
-    public EventClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public EventClient(@Value("${shareit-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
