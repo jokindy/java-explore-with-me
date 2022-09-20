@@ -1,15 +1,47 @@
-version: '3.1'
+version: '3.8'
 services:
-  stats-server:
+
+  ewm-stats:
+    build: server/
+    image: ewm-stats
     ports:
       - "9090:9090"
+    depends_on:
+      - ewm-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats
+      - DB_NAME=stats
+      - POSTGRES_USER=jokindy
+      - POSTGRES_PASSWORD=iamroot
 
   stats-db:
-    image: postgres:14-alpine
+    image: postgres:13.7-alpine
+    ports:
+      - "6542:5432"
+    environment:
+      - POSTGRES_DB=stats
+      - POSTGRES_USER=jokindy
+      - POSTGRES_PASSWORD=iamroot
 
   ewm-service:
+    build: server/
+    image: ewm-server
     ports:
       - "8080:8080"
+    depends_on:
+      - ewm-db
+    environment:
+      - STATS_SERVER_URL=http://ewm-stats:9090
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/explore
+      - DB_NAME=explore
+      - POSTGRES_USER=jokindy
+      - POSTGRES_PASSWORD=iamroot
 
   ewm-db:
-    image: postgres:14-alpine
+    image: postgres:13.7-alpine
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=explore
+      - POSTGRES_USER=jokindy
+      - POSTGRES_PASSWORD=iamroot
