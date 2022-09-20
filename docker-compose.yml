@@ -2,10 +2,10 @@ version: '3.8'
 services:
 
   ewm-stats:
-    build: server/
+    build: stats/
     image: ewm-stats
     ports:
-      - "9090:8080"
+      - "9090:9090"
     depends_on:
       - ewm-db
     environment:
@@ -32,7 +32,7 @@ services:
       - ewm-stats
       - ewm-db
     environment:
-      - SHAREIT_SERVER_URL=http://ewm-stats:8080
+      - SHAREIT_SERVER_URL=http://ewm-stats:9090
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/explore
       - DB_NAME=explore
       - POSTGRES_USER=jokindy
