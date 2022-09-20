@@ -1,2 +1,2 @@
 # java-explore-with-me
-Ссылочка на пул-реквест - https://github.com/jokindy/java-explore-with-me/pull/1
+Ссылочка на пул-реквест - https://github.com/jokindy/java-explore-with-me/pull/2
