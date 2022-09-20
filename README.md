@@ -1,2 +1,2 @@
 # java-explore-with-me
-Template repository for ExploreWithMe project.
+Ссылочка на пул-реквест - https://github.com/jokindy/java-explore-with-me/pull/1
