@@ -15,28 +15,28 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class StatsService {
 
-    private final StatsRepo statsRepo;
+    private final StatsRepository statsRepository;
 
     public void save(EndpointHit endpointHit) {
-        log.debug("STATS SERVICE - saving new endpoint hit to DB: {}", endpointHit);
-        statsRepo.save(endpointHit);
+        log.debug("Saving new endpoint hit to DB: {}", endpointHit);
+        statsRepository.save(endpointHit);
     }
 
     public Integer getViews(String uri) {
-        log.debug("STATS SERVICE - getting views to uri: {}", uri);
-        return statsRepo.getViews(uri);
+        log.debug("Getting views to uri: {}", uri);
+        return statsRepository.getViews(uri);
     }
 
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, String[] uri, boolean unique) {
-        log.debug("STATS SERVICE - getting stats by start: {}," +
+        log.debug("Getting stats by start: {}," +
                 "end: {}," +
                 "uri: {}," +
                 "unique: {}", start, end, uri, unique);
         List<ViewStats> viewStats;
         if (!unique) {
-            viewStats = statsRepo.findAllNotUnique(start, end);
+            viewStats = statsRepository.findAllNotUnique(start, end);
         } else {
-            viewStats = statsRepo.findAllUnique(start, end);
+            viewStats = statsRepository.findAllUnique(start, end);
         }
         if (uri != null) {
             return viewStats.stream()

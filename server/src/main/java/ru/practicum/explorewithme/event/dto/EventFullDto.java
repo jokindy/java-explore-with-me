@@ -1,9 +1,11 @@
 package ru.practicum.explorewithme.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.explorewithme.category.dto.CategoryDto;
+import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.user.dto.UserShortDto;
 
@@ -11,6 +13,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class EventFullDto {
 
     private Long id;
@@ -24,7 +27,7 @@ public class EventFullDto {
     private LocalDateTime eventDate;
 
     private LocationDto location;
-    private Integer confirmedRequests;
+    private long confirmedRequests;
     private CategoryDto category;
     private UserShortDto initiator;
     private boolean paid;
@@ -37,4 +40,23 @@ public class EventFullDto {
     private EventState state;
     private String title;
     private int views;
+
+    public static EventFullDto construct(Event event, int views) {
+        return new EventFullDto(event.getId(),
+                event.getAnnotation(),
+                event.getDescription(),
+                event.getCreatedOn(),
+                event.getEventDate(),
+                LocationDto.construct(event.getLocation()),
+                event.getConfirmedRequests(),
+                CategoryDto.construct(event.getCategory()),
+                UserShortDto.construct(event.getInitiator()),
+                event.isPaid(),
+                event.getParticipantLimit(),
+                event.getPublishedOn(),
+                event.isRequestModeration(),
+                event.getState(),
+                event.getTitle(),
+                views);
+    }
 }

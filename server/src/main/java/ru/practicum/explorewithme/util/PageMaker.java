@@ -16,9 +16,6 @@ public class PageMaker<T> {
     }
 
     private Pageable getPageable(int from, int size) {
-        if (size == 0) {
-            throw new RuntimeException("Size can't be a zero");
-        }
         return PageRequest.of(from, size, Sort.by("id").descending());
     }
 }

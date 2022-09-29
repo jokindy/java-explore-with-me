@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.compilation.Compilation;
-import ru.practicum.explorewithme.compilation.CompilationRepo;
+import ru.practicum.explorewithme.compilation.CompilationRepository;
 import ru.practicum.explorewithme.compilation.common.CompilationPublicService;
+import ru.practicum.explorewithme.compilation.dto.CompilationDto;
+import ru.practicum.explorewithme.compilation.dto.NewCompilationDto;
 import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.user.EventUserService;
 import ru.practicum.explorewithme.exception.UpdateIsForbiddenException;
+import ru.practicum.explorewithme.util.Mapper;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -21,59 +24,62 @@ import java.util.stream.Collectors;
 public class CompilationAdminService {
 
     private final CompilationPublicService compilationPublicService;
+    private final CompilationRepository compilationRepository;
     private final EventUserService eventService;
-    private final CompilationRepo compilationRepo;
+    private final Mapper mapper;
 
-
-    public Compilation save(Compilation compilation, List<Long> eventsId) {
-        log.debug("COMPILATION ADMIN SERVICE - saving compilation to DB: {} with events: {}", compilation, eventsId);
+    public CompilationDto save(NewCompilationDto compilationDto) {
+        log.debug("Saving compilation to DB: {} with events: {}", compilationDto, compilationDto.getEvents());
+        List<Long> eventsId = compilationDto.getEvents();
+        Compilation compilation = NewCompilationDto.toDomain(compilationDto);
         Set<Event> events = eventsId.stream()
                 .map(eventService::getEventById)
                 .collect(Collectors.toSet());
         compilation.setEvents(events);
-        return compilationRepo.save(compilation);
+        compilationRepository.save(compilation);
+        return mapper.map(compilation, CompilationDto.class);
     }
 
     public void deleteCompilation(long compId) {
-        log.debug("COMPILATION ADMIN SERVICE - deleting compilation ID: {}", compId);
+        log.debug("Deleting compilation ID: {}", compId);
         compilationPublicService.checkCompilationId(compId);
-        compilationRepo.deleteById(compId);
+        compilationRepository.deleteById(compId);
     }
 
     @Transactional
     public void handleEventId(long compId, long eventId, boolean isDeleting) {
-        log.debug("COMPILATION ADMIN SERVICE - handle event: {} in compilation id: {}, is deleting - {}",
+        log.debug("Handle event: {} in compilation id: {}, is deleting - {}",
                 eventId, compId, isDeleting);
         Compilation compilation = compilationPublicService.getCompilation(compId);
         Event event = eventService.getEventById(eventId);
         if (isDeleting) {
             if (compilation.getEvents().contains(event)) {
-                compilationRepo.deleteEventFromCompilation(compId, eventId);
+                compilationRepository.deleteEventFromCompilation(compId, eventId);
             }
         } else {
             if (!compilation.getEvents().contains(event)) {
-                compilationRepo.addEventToCompilation(compId, eventId);
+                compilationRepository.addEventToCompilation(compId, eventId);
             }
         }
     }
 
     @Transactional
     public void handleCompilationPin(long compId, boolean isDeleting) {
-        log.debug("COMPILATION ADMIN SERVICE - handle compilation id: {} pinned, is pinned - {}", compId, isDeleting);
+        log.debug("Handle compilation id: {} pinned, is pinned - {}", compId, isDeleting);
         Compilation compilation = compilationPublicService.getCompilation(compId);
         boolean pinned = compilation.isPinned();
         if (isDeleting) {
             if (pinned) {
-                compilationRepo.setCompilationPinned(false, compId);
+                compilationRepository.setCompilationPinned(false, compId);
             } else {
-                log.warn("COMPILATION ADMIN SERVICE - UpdateIsForbiddenException");
+                log.error("UpdateIsForbiddenException");
                 throw new UpdateIsForbiddenException(String.format("Compilation id: %s is already unpinned", compId));
             }
         } else {
             if (!pinned) {
-                compilationRepo.setCompilationPinned(true, compId);
+                compilationRepository.setCompilationPinned(true, compId);
             } else {
-                log.warn("COMPILATION ADMIN SERVICE - UpdateIsForbiddenException");
+                log.error("UpdateIsForbiddenException");
                 throw new UpdateIsForbiddenException(String.format("Compilation id: %s is already pinned", compId));
             }
         }

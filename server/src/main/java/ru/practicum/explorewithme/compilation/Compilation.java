@@ -8,6 +8,7 @@ import lombok.ToString;
 import ru.practicum.explorewithme.event.Event;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Set;
 
 @Getter
@@ -21,7 +22,12 @@ public class Compilation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    @Size(min = 5, max = 120)
     private String title;
+
+    @Column(nullable = false)
     private boolean pinned;
 
     @ManyToMany

@@ -7,7 +7,7 @@ import ru.practicum.explorewithme.stat.dto.ViewStats;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface StatsRepo extends JpaRepository<EndpointHit, Long> {
+public interface StatsRepository extends JpaRepository<EndpointHit, Long> {
 
     String QUERY_NON_UNIQUE = "select distinct(e.uri) as uri, count(e.app) as hits, e.app as app " +
             "from EndpointHit e where e.timestamp > ?1 and e.timestamp < ?2" +

@@ -1,6 +1,5 @@
 package ru.practicum.explorewithme.stat;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,21 +12,25 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@AllArgsConstructor
 public class StatsController {
 
     private final StatsService statsService;
     private final ModelMapper modelMapper;
 
+    public StatsController(StatsService statsService) {
+        this.statsService = statsService;
+        this.modelMapper = new ModelMapper();
+    }
+
     @GetMapping("/hit")
     public Integer getViews(@RequestParam String uri) {
-        log.debug("STATS CONTROLLER - get views to event uri: {}", uri);
+        log.debug("Get views to event uri: {}", uri);
         return statsService.getViews(uri);
     }
 
     @PostMapping("/hit")
     public void save(@RequestBody EndpointHitDto endpointHitDto) {
-        log.debug("STATS CONTROLLER - save new event request by uri: {}", endpointHitDto.getUri());
+        log.debug("Save new event request by uri: {}", endpointHitDto.getUri());
         EndpointHit endpointHit = modelMapper.map(endpointHitDto, EndpointHit.class);
         statsService.save(endpointHit);
     }
@@ -37,7 +40,7 @@ public class StatsController {
                                     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
                                     @RequestParam(required = false) String[] uris,
                                     @RequestParam(defaultValue = "false") boolean unique) {
-        log.debug("STATS CONTROLLER - get views to event uri");
+        log.debug("Get views to event uri");
         return statsService.getStats(start, end, uris, unique);
     }
 }

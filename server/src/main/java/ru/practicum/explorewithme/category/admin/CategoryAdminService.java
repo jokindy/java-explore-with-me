@@ -4,8 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.category.Category;
-import ru.practicum.explorewithme.category.CategoryRepo;
+import ru.practicum.explorewithme.category.CategoryRepository;
 import ru.practicum.explorewithme.category.common.CategoryPublicService;
+import ru.practicum.explorewithme.category.dto.CategoryDto;
 import ru.practicum.explorewithme.exception.UpdateIsForbiddenException;
 
 @Slf4j
@@ -13,32 +14,36 @@ import ru.practicum.explorewithme.exception.UpdateIsForbiddenException;
 @AllArgsConstructor
 public class CategoryAdminService {
 
-    private final CategoryRepo categoryRepo;
-    private CategoryPublicService categoryPublicService;
+    private final CategoryRepository categoryRepository;
+    private final CategoryPublicService categoryPublicService;
 
-    public Category save(Category category) {
-        log.debug("CATEGORY ADMIN SERVICE - saving new category to DB: {}", category);
-        return categoryRepo.save(category);
+    public CategoryDto save(CategoryDto dto) {
+        log.debug("Saving new category to DB: {}", dto);
+        Category category = CategoryDto.toDomain(dto);
+        categoryRepository.save(category);
+        return CategoryDto.construct(category);
     }
 
-    public void patch(Category updatedCategory) {
-        log.debug("CATEGORY ADMIN SERVICE - updating category by: {}", updatedCategory);
-        Category category = get(updatedCategory.getId());
+    public CategoryDto patch(CategoryDto dto) {
+        log.debug("Updating category by: {}", dto);
+        Category updatedCategory = CategoryDto.toDomain(dto);
+        Category category = CategoryDto.toDomain(get(updatedCategory.getId()));
         if (category.equals(updatedCategory)) {
-            log.warn("CATEGORY ADMIN SERVICE - UpdateIsForbiddenException");
+            log.error("UpdateIsForbiddenException");
             throw new UpdateIsForbiddenException("Same category");
         }
-        categoryRepo.save(updatedCategory);
+        categoryRepository.save(updatedCategory);
+        return CategoryDto.construct(updatedCategory);
     }
 
     public void delete(long categoryId) {
-        log.debug("CATEGORY ADMIN SERVICE - deleting category id: {}", categoryId);
+        log.debug("Deleting category id: {}", categoryId);
         categoryPublicService.checkCategoryId(categoryId);
-        categoryRepo.deleteById(categoryId);
+        categoryRepository.deleteById(categoryId);
     }
 
-    public Category get(long categoryId) {
-        log.debug("CATEGORY ADMIN SERVICE - getting category id: {}", categoryId);
+    public CategoryDto get(long categoryId) {
+        log.debug("Getting category id: {}", categoryId);
         return categoryPublicService.get(categoryId);
     }
 }

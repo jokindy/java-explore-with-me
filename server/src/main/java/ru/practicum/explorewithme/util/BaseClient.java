@@ -23,7 +23,6 @@ public class BaseClient {
         return makeAndSendRequest(HttpMethod.POST, path, body);
     }
 
-
     private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable T body) {
         HttpEntity<T> requestEntity = null;
         if (body != null) {
@@ -37,7 +36,6 @@ public class BaseClient {
         }
         return prepareGatewayResponse(response);
     }
-
 
     private static ResponseEntity<Object> prepareGatewayResponse(ResponseEntity<Object> response) {
         if (response.getStatusCode().is2xxSuccessful()) {

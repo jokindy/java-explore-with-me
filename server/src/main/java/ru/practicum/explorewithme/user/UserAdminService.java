@@ -2,9 +2,9 @@ package ru.practicum.explorewithme.user;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.exception.ModelNotFoundException;
+import ru.practicum.explorewithme.user.dto.UserDto;
 import ru.practicum.explorewithme.util.PageMaker;
 
 import java.util.Arrays;
@@ -18,40 +18,44 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserAdminService {
 
-    private final UserRepo userRepo;
+    private final UserRepository userRepository;
     private final PageMaker<User> pageMaker;
 
-    public User save(User user) {
-        return userRepo.save(user);
+    public UserDto save(UserDto dto) {
+        User user = UserDto.toDomain(dto);
+        userRepository.save(user);
+        return UserDto.construct(user);
     }
 
-    public Page<User> getUsers(Long[] ids, int from, int size) {
-        log.debug("USER ADMIN SERVICE - getting users id: {}", (Object) ids);
+    public List<UserDto> getUsers(Long[] ids, int from, int size) {
+        log.debug("Getting users id: {}", (Object) ids);
         List<Long> longList = Arrays.asList(ids);
         List<User> users = longList.stream()
                 .map(this::get)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        return pageMaker.getPage(from, size, users);
+        return pageMaker.getPage(from, size, users).stream()
+                .map(UserDto::construct)
+                .collect(Collectors.toList());
     }
 
 
     public User get(long userId) {
-        log.debug("USER ADMIN SERVICE - getting user id: {}", userId);
-        Optional<User> userOptional = userRepo.findById(userId);
+        log.debug("Getting user id: {}", userId);
+        Optional<User> userOptional = userRepository.findById(userId);
         return userOptional.orElse(null);
     }
 
     public void delete(long userId) {
-        log.debug("USER ADMIN SERVICE - deleting user id: {}", userId);
+        log.debug("Deleting user id: {}", userId);
         checkUserId(userId);
-        userRepo.deleteById(userId);
+        userRepository.deleteById(userId);
     }
 
     public void checkUserId(long userId) {
-        boolean isExists = userRepo.existsById(userId);
+        boolean isExists = userRepository.existsById(userId);
         if (!isExists) {
-            log.warn("USER ADMIN SERVICE - ModelNotFoundException");
+            log.error("ModelNotFoundException");
             throw new ModelNotFoundException(userId, User.class.getSimpleName());
         }
     }

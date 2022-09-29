@@ -4,18 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.event.Event;
-import ru.practicum.explorewithme.event.EventFilter;
-import ru.practicum.explorewithme.event.EventRepo;
+import ru.practicum.explorewithme.event.EventClient;
 import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.event.common.EventPublicService;
+import ru.practicum.explorewithme.event.dto.AdminUpdateEventDto;
+import ru.practicum.explorewithme.event.dto.EventFullDto;
+import ru.practicum.explorewithme.event.repository.EventRepository;
 import ru.practicum.explorewithme.exception.UpdateIsForbiddenException;
+import ru.practicum.explorewithme.util.Mapper;
 import ru.practicum.explorewithme.util.PageMaker;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,46 +25,48 @@ import java.util.stream.Collectors;
 public class EventAdminService {
 
     private final EventPublicService eventPublicService;
-    private final EventRepo eventRepo;
+    private final EventRepository eventRepository;
+    private final EventClient eventClient;
+    private final Mapper mapper;
     private final PageMaker<Event> pageMaker;
 
-    public List<Event> getEvents(Long[] userIds,
-                                 EventState[] states,
-                                 Long[] categories,
-                                 LocalDateTime rangeStart,
-                                 LocalDateTime rangeEnd,
-                                 int from,
-                                 int size) {
-        log.debug("EVENT ADMIN SERVICE - getting events by: " +
-                        "\nuser ids: {}, " +
-                        "\nstates: {}, " +
-                        "\ncategories: {}, " +
-                        "\nrangeStart: {}, " +
-                        "\nrangeEnd: {}", userIds, states, categories, rangeStart, rangeEnd);
-        List<Event> events = Arrays.stream(userIds)
-                .map(eventRepo::findEventByInitiatorId)
-                .filter(Objects::nonNull)
-                .map(event -> EventFilter.filterByCategoryId(event, categories))
-                .filter(Objects::nonNull)
-                .map(event -> EventFilter.filterByState(event, states))
-                .filter(Objects::nonNull)
-                .map(event -> EventFilter.filterByStartAndEnd(event, rangeStart, rangeEnd))
-                .filter(Objects::nonNull)
+    public List<EventFullDto> getEvents(Long[] userIds,
+                                        EventState[] states,
+                                        Long[] categories,
+                                        LocalDateTime rangeStart,
+                                        LocalDateTime rangeEnd,
+                                        int from,
+                                        int size) {
+        log.debug("Getting events by: " +
+                "\nuser ids: {}, " +
+                "\nstates: {}, " +
+                "\ncategories: {}, " +
+                "\nrangeStart: {}, " +
+                "\nrangeEnd: {}", userIds, states, categories, rangeStart, rangeEnd);
+        List<Event> events = eventRepository.findEventsByAdminFilters(userIds, states, categories, rangeStart, rangeEnd);
+        List<Event> list = pageMaker.getPage(from, size, events).getContent();
+        return list.stream()
+                .map(event -> {
+                    int views = getViews(event.getId());
+                    return EventFullDto.construct(event, views);
+                })
                 .collect(Collectors.toList());
-        return pageMaker.getPage(from, size, events).getContent();
     }
 
-    public void putEvent(Event event) {
-        log.debug("EVENT ADMIN SERVICE - updating event by: {}", event);
-        eventRepo.save(event);
+    public EventFullDto putEvent(AdminUpdateEventDto eventDto, long eventId) {
+        log.debug("Updating event by: {}", eventDto);
+        Event event = getEvent(eventId);
+        mapper.map(eventDto, event);
+        eventRepository.save(event);
+        return EventFullDto.construct(event, getViews(eventId));
     }
 
     @Transactional
-    public Event changeEventState(long eventId, boolean isPublish) {
-        log.debug("EVENT ADMIN SERVICE - changing Event id: {}'s status, is publish - {}", eventId, isPublish);
+    public EventFullDto changeEventState(long eventId, boolean isPublish) {
+        log.debug("Changing Event id: {}'s status, is publish - {}", eventId, isPublish);
         Event event = getEvent(eventId);
         if (!event.getState().equals(EventState.PENDING)) {
-            log.warn("EVENT ADMIN SERVICE - UpdateIsForbiddenException");
+            log.error("UpdateIsForbiddenException");
             throw new UpdateIsForbiddenException(String.format("Event id: %s is already updated", eventId));
         }
         if (isPublish) {
@@ -72,11 +75,18 @@ public class EventAdminService {
         } else {
             event.setState(EventState.CANCELED);
         }
-        return eventRepo.save(event);
+        eventRepository.save(event);
+        return EventFullDto.construct(event, getViews(eventId));
     }
 
+
     public Event getEvent(long eventId) {
-        log.debug("EVENT ADMIN SERVICE - getting event id: {}", eventId);
+        log.debug("Getting event id: {}", eventId);
         return eventPublicService.getEvent(eventId);
+    }
+
+    private int getViews(long id) {
+        String uri = "/events/" + id;
+        return (Integer) eventClient.getViews(uri);
     }
 }

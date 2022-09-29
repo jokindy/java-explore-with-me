@@ -6,7 +6,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.user.dto.UserDto;
 import ru.practicum.explorewithme.user.dto.validation.BasicInfo;
-import ru.practicum.explorewithme.util.Mapper;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -21,28 +20,24 @@ import java.util.List;
 public class UserAdminController {
 
     private final UserAdminService userAdminService;
-    private final Mapper mapper;
 
-    @GetMapping()
+    @GetMapping
     public List<UserDto> getUsers(@RequestParam Long[] ids,
                                   @Valid @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                   @Valid @Positive @RequestParam(defaultValue = "10") int size) {
-        log.info("USER ADMIN CONTROLLER - Getting users id: {}", (Object) ids);
-        List<User> users = userAdminService.getUsers(ids, from, size).getContent();
-        return mapper.mapList(users, UserDto.class);
+        log.info("Getting users id: {}", (Object) ids);
+        return userAdminService.getUsers(ids, from, size);
     }
 
-    @PostMapping()
+    @PostMapping
     public UserDto saveUser(@Validated(BasicInfo.class) @RequestBody UserDto userDto) {
-        log.debug("USER ADMIN CONTROLLER - saving new user: {}", userDto);
-        User user = mapper.map(userDto, User.class);
-        userAdminService.save(user);
-        return mapper.map(user, UserDto.class);
+        log.debug("Saving new user: {}", userDto);
+        return userAdminService.save(userDto);
     }
 
     @DeleteMapping("/{userId}")
     public String deleteUser(@PathVariable long userId) {
-        log.debug("USER ADMIN CONTROLLER - deleting user id: {}", userId);
+        log.debug("Deleting user id: {}", userId);
         userAdminService.delete(userId);
         return String.format("User id: %s is deleted", userId);
     }

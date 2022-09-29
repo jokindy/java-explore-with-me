@@ -8,8 +8,8 @@ import ru.practicum.explorewithme.event.dto.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -22,26 +22,21 @@ public class EventUserController {
 
     @GetMapping("/{userId}/events")
     public List<EventShortDto> getEventsByUser(@PathVariable long userId,
-                                               @Valid @Positive @RequestParam(defaultValue = "0") int from,
+                                               @Valid @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                                @Valid @Positive @RequestParam(defaultValue = "10") int size) {
-        log.debug("EVENT USER CONTROLLER - get user id: {}'s events", userId);
-        List<Event> events = eventService.getUserEvents(userId, from, size).getContent();
-        return events.stream()
-                .map(eventMapper::mapToShortDto)
-                .collect(Collectors.toList());
+        log.debug("Get user id: {}'s events", userId);
+        return eventService.getUserEvents(userId, from, size);
     }
 
     @PostMapping("/{userId}/events")
     public EventFullDto postEventByUser(@Valid @RequestBody NewEventDto eventDto, @PathVariable long userId) {
-        log.debug("EVENT USER CONTROLLER - post event by user id: {}, DTO - {}", userId, eventDto);
-        Event event = eventMapper.map(eventDto, userId);
-        eventService.save(event);
-        return eventMapper.mapToFullDto(event);
+        log.debug("Post event by user id: {}, DTO - {}", userId, eventDto);
+        return eventService.save(eventDto, userId);
     }
 
     @PatchMapping("/{userId}/events")
     public EventFullDto patchEventsByUser(@Valid @RequestBody UpdateEventRequest eventDto, @PathVariable long userId) {
-        log.debug("EVENT USER CONTROLLER - patch event id: {} by user id: {}", eventDto.getEventId(), userId);
+        log.debug("Patch event id: {} by user id: {}", eventDto.getEventId(), userId);
         Event event = eventService.getEventById(eventDto.getEventId());
         eventMapper.map(eventDto, event);
         eventService.patchEvent(event, userId);
@@ -50,15 +45,13 @@ public class EventUserController {
 
     @GetMapping("/{userId}/events/{eventId}")
     public EventFullDto getEventByEventId(@PathVariable long userId, @PathVariable long eventId) {
-        log.debug("EVENT USER CONTROLLER - get event id: {} by owner id: {}", eventId, userId);
-        Event event = eventService.getEventByOwnerId(userId, eventId);
-        return eventMapper.mapToFullDto(event);
+        log.debug("Get event id: {} by owner id: {}", eventId, userId);
+        return eventService.getEventByOwnerId(userId, eventId);
     }
 
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto cancelEventByEventId(@PathVariable long userId, @PathVariable long eventId) {
-        log.debug("EVENT USER CONTROLLER - cancel event id: {} by owner id: {}", eventId, userId);
-        Event event = eventService.cancelEvent(userId, eventId);
-        return eventMapper.mapToFullDto(event);
+        log.debug("Cancel event id: {} by owner id: {}", eventId, userId);
+        return eventService.cancelEvent(userId, eventId);
     }
 }

@@ -8,9 +8,11 @@ import org.hibernate.Hibernate;
 import ru.practicum.explorewithme.category.Category;
 import ru.practicum.explorewithme.compilation.Compilation;
 import ru.practicum.explorewithme.request.Request;
+import ru.practicum.explorewithme.request.RequestStatus;
 import ru.practicum.explorewithme.user.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -29,40 +31,50 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    @Size(min = 3, max = 120)
     private String title;
+
+    @Column(nullable = false)
+    @Size(min = 20, max = 2000)
     private String annotation;
+
+    @Column(nullable = false)
+    @Size(min = 20, max = 7000)
     private String description;
 
-    @Column(name = "category_id")
+    @Column(name = "category_id", nullable = false)
     private long categoryId;
 
-    @Column(name = "created")
+    @Column(name = "created", nullable = false)
     private LocalDateTime createdOn;
 
-    @Column(name = "event_date")
+    @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
 
-    @Column(name = "initiator_id")
+    @Column(name = "initiator_id", nullable = false)
     private Long initiatorId;
 
+    @Column(nullable = false)
     private boolean paid;
 
-    @Column(name = "participant_limit")
+    @Column(name = "participant_limit", nullable = false)
     private int participantLimit;
 
     @Column(name = "published_on")
     private LocalDateTime publishedOn;
 
-    @Column(name = "request_moderation")
+    @Column(name = "request_moderation", nullable = false)
     private boolean requestModeration;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private EventState state;
 
     @Embedded
     private Location location;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     @ToString.Exclude
     private List<Request> requests;
@@ -71,15 +83,21 @@ public class Event {
     @ToString.Exclude
     private Set<Compilation> compilations;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "initiator_id", insertable = false, updatable = false, nullable = false)
     @ToString.Exclude
     private User initiator;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", insertable = false, updatable = false, nullable = false)
     @ToString.Exclude
     private Category category;
+
+    public long getConfirmedRequests() {
+        return requests.stream()
+                .filter(request -> request.getStatus().equals(RequestStatus.CONFIRMED))
+                .count();
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -91,6 +109,18 @@ public class Event {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(getId(),
+                getTitle(),
+                getAnnotation(),
+                getDescription(),
+                getCategoryId(),
+                getCreatedOn(),
+                getEventDate(),
+                getInitiatorId(),
+                isPaid(),
+                getParticipantLimit(),
+                getPublishedOn(),
+                isRequestModeration(),
+                getState());
     }
 }

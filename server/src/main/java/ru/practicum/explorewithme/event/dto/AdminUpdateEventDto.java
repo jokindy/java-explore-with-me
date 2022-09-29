@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AdminUpdateEventDto {
 
-
     private String annotation;
     private long category;
     private String description;

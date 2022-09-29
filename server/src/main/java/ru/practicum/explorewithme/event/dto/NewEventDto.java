@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import ru.practicum.explorewithme.event.Event;
+import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.event.dto.validation.ValidEventDate;
 
 import javax.validation.constraints.NotNull;
@@ -40,4 +42,21 @@ public class NewEventDto {
 
     @Length(min = 3, max = 120)
     private String title;
+
+    public static Event toDomain(NewEventDto dto, long userId) {
+        Event event = new Event();
+        event.setAnnotation(dto.getAnnotation());
+        event.setCategoryId(dto.getCategory());
+        event.setDescription(dto.getDescription());
+        event.setCreatedOn(LocalDateTime.now());
+        event.setInitiatorId(userId);
+        event.setLocation(LocationDto.toDomain(dto.location));
+        event.setEventDate(dto.getEventDate());
+        event.setPaid(dto.isPaid());
+        event.setParticipantLimit(dto.getParticipantLimit());
+        event.setTitle(dto.getTitle());
+        event.setRequestModeration(dto.isRequestModeration());
+        event.setState(EventState.PENDING);
+        return event;
+    }
 }

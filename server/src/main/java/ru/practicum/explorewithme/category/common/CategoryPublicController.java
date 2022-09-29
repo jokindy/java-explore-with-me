@@ -3,10 +3,11 @@ package ru.practicum.explorewithme.category.common;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.category.Category;
 import ru.practicum.explorewithme.category.dto.CategoryDto;
-import ru.practicum.explorewithme.util.Mapper;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -16,20 +17,17 @@ import java.util.List;
 public class CategoryPublicController {
 
     private final CategoryPublicService categoryService;
-    private final Mapper mapper;
 
-    @GetMapping()
-    public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0") int from,
-                                           @RequestParam(defaultValue = "10") int size) {
-        log.debug("CATEGORY PUBLIC CONTROLLER - getting categories");
-        List<Category> categories = categoryService.getAll(from, size).getContent();
-        return mapper.mapList(categories, CategoryDto.class);
+    @GetMapping
+    public List<CategoryDto> getCategories(@Valid @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+                                           @Valid @Positive @RequestParam(defaultValue = "10") int size) {
+        log.debug("Getting categories");
+        return categoryService.getAll(from, size);
     }
 
     @GetMapping("/{catId}")
     public CategoryDto getCategoryById(@PathVariable long catId) {
-        log.debug("CATEGORY PUBLIC CONTROLLER - getting category id: {}", catId);
-        Category category = categoryService.get(catId);
-        return mapper.map(category, CategoryDto.class);
+        log.debug("Getting category id: {}", catId);
+        return categoryService.get(catId);
     }
 }

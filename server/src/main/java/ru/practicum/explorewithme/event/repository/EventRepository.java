@@ -1,14 +1,16 @@
-package ru.practicum.explorewithme.event;
+package ru.practicum.explorewithme.event.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import ru.practicum.explorewithme.event.Event;
+import ru.practicum.explorewithme.event.EventState;
 
 import java.util.List;
 
-public interface EventRepo extends JpaRepository<Event, Long> {
+public interface EventRepository extends JpaRepository<Event, Long>, EventRepositoryCustom {
 
     Page<Event> findAllByInitiatorId(long userId, Pageable pageable);
 
