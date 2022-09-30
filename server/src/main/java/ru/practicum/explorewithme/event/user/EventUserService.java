@@ -62,7 +62,7 @@ public class EventUserService {
                 .collect(Collectors.toList());
     }
 
-    public EventFullDto getEventByOwnerId(long userId, long eventId) {
+    public Event getEventByOwnerId(long userId, long eventId) {
         log.warn("Getting event id: {} by user id: {}", eventId, userId);
         userAdminService.checkUserId(userId);
         Optional<Event> eventOptional = eventRepository.findById(eventId);
@@ -73,7 +73,7 @@ public class EventUserService {
                 throw new UserNotInitiatorException(String.format("User id: %s is not initiator for event id: %s",
                         userId, eventId));
             }
-            return EventFullDto.construct(eventOptional.get(), getViews(eventId));
+            return eventOptional.get();
         } else {
             log.error("ModelNotFoundException");
             throw new ModelNotFoundException(eventId, Event.class.getSimpleName());
@@ -106,9 +106,9 @@ public class EventUserService {
     }
 
     @Transactional
-    public EventFullDto cancelEvent(long userId, long eventId) {
+    public Event cancelEvent(long userId, long eventId) {
         log.warn("Cancel event id: {} by user id: {}", eventId, userId);
-        EventFullDto event = getEventByOwnerId(userId, eventId);
+        Event event = getEventByOwnerId(userId, eventId);
         if (event.getState().equals(CANCELED)) {
             log.error("UpdateIsForbiddenException");
             throw new UpdateIsForbiddenException(String.format("Event id: %s can't be canceled because it status is: %s",

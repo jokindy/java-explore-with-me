@@ -15,6 +15,12 @@ public class PageMaker<T> {
         return new PageImpl<>(list.subList(start, end), pageable, list.size());
     }
 
+    public Page<T> getPage(List<T> list, Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), list.size());
+        return new PageImpl<>(list.subList(start, end), pageable, list.size());
+    }
+
     private Pageable getPageable(int from, int size) {
         return PageRequest.of(from, size, Sort.by("id").descending());
     }

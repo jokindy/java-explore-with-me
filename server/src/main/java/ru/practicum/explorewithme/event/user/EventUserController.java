@@ -46,12 +46,15 @@ public class EventUserController {
     @GetMapping("/{userId}/events/{eventId}")
     public EventFullDto getEventByEventId(@PathVariable long userId, @PathVariable long eventId) {
         log.debug("Get event id: {} by owner id: {}", eventId, userId);
-        return eventService.getEventByOwnerId(userId, eventId);
+        Event event = eventService.getEventByOwnerId(userId, eventId);
+        return eventMapper.mapToFullDto(event);
+
     }
 
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto cancelEventByEventId(@PathVariable long userId, @PathVariable long eventId) {
         log.debug("Cancel event id: {} by owner id: {}", eventId, userId);
-        return eventService.cancelEvent(userId, eventId);
+        Event event = eventService.cancelEvent(userId, eventId);
+        return eventMapper.mapToFullDto(event);
     }
 }

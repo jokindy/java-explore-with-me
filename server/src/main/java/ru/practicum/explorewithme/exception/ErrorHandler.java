@@ -16,7 +16,18 @@ import java.util.List;
 @RestControllerAdvice
 public class ErrorHandler {
 
-        // Попытка оставить запрос на отмененное или неопубликованное событие
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleUnrelatedEntitiesException(final CommentingIsForbiddenException e) {
+        return ApiError.builder()
+                .status(HttpStatus.FORBIDDEN)
+                .reason("For the requested operation the conditions are not met.")
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    // Попытка оставить запрос на отмененное или неопубликованное событие
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)

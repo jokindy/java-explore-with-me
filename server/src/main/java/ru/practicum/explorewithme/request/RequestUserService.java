@@ -122,4 +122,8 @@ public class RequestUserService {
         requestRepository.save(request);
         return ParticipantRequestDto.construct(request);
     }
+
+    public Request getRequest(long userId, long eventId) {
+        return requestRepository.findByRequesterIdAndEventId(userId, eventId);
+    }
 }
