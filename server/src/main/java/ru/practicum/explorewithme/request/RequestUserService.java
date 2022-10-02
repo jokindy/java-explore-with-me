@@ -34,7 +34,7 @@ public class RequestUserService {
         }
         if (!event.getState().equals(EventState.PUBLISHED)) {
             log.error("EventIsNotAvailableException");
-            throw new EventIsNotAvailableException(String.format("You can't make request to event id: %s because " +
+            throw new EntityIsNotAvailableException(String.format("You can't make request to event id: %s because " +
                     "this event is not published", eventId));
         }
         int confirmedRequests = requestRepository.getConfirmedRequests(eventId);
@@ -42,7 +42,7 @@ public class RequestUserService {
         if (participantLimit != 0) {
             if (participantLimit <= confirmedRequests) {
                 log.error("EventIsNotAvailableException");
-                throw new EventIsNotAvailableException(String.format("You can't make request to event id: %s because " +
+                throw new EntityIsNotAvailableException(String.format("You can't make request to event id: %s because " +
                         "participant limit is over", eventId));
             }
         }

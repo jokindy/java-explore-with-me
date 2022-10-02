@@ -31,7 +31,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ApiError handleEventIsNotAvailableException(final EventIsNotAvailableException e) {
+    public ApiError handleEventIsNotAvailableException(final EntityIsNotAvailableException e) {
         return ApiError.builder()
                 .status(HttpStatus.FORBIDDEN)
                 .reason("For the requested operation the conditions are not met.")

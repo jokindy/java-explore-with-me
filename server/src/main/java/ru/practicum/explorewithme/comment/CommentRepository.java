@@ -9,7 +9,8 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findAllByEventIdAndState(long eventId, CommentState state, Pageable pageable);
+    List<Comment> findAllByEventIdAndStateAndPositive(long eventId, CommentState state,
+                                                      Boolean positive, Pageable pageable);
 
     @Modifying
     @Query(value = "update Comment c set c.state = ?1 where c.id = ?2")

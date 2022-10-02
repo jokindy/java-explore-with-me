@@ -1,16 +1,16 @@
 package ru.practicum.explorewithme.comment.admin;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.comment.Comment;
 import ru.practicum.explorewithme.comment.dto.CommentDto;
 import ru.practicum.explorewithme.util.Mapper;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
+@RequestMapping("/admin/comments")
 public class CommentAdminController {
 
     private final Mapper mapper;
@@ -20,8 +20,9 @@ public class CommentAdminController {
      * Метод меняет статус коммента на PUBLISHED
      */
 
-    @PatchMapping("/admin/comments/{commentId}/publish")
+    @PatchMapping("/{commentId}/publish")
     public CommentDto publishComment(@PathVariable long commentId) {
+        log.debug("Publish comment id: {}", commentId);
         Comment comment = commentService.handleCommentStatus(commentId, true);
         return mapper.map(comment, CommentDto.class);
     }
@@ -30,8 +31,9 @@ public class CommentAdminController {
      * Метод меняет статус коммента на REJECTED
      */
 
-    @PatchMapping("/admin/comments/{commentId}/reject")
+    @PatchMapping("/{commentId}/reject")
     public CommentDto rejectComment(@PathVariable long commentId) {
+        log.debug("Reject comment id: {}", commentId);
         Comment comment = commentService.handleCommentStatus(commentId, false);
         return mapper.map(comment, CommentDto.class);
     }
@@ -42,6 +44,7 @@ public class CommentAdminController {
 
     @DeleteMapping("/admin/comments/{commentId}")
     public String deleteComment(@PathVariable long commentId) {
+        log.debug("Delete comment id: {}", commentId);
         commentService.deleteComment(commentId);
         return String.format("Comment id: %s is deleted", commentId);
     }
