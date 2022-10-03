@@ -13,7 +13,6 @@ import ru.practicum.explorewithme.exception.CommentingIsForbiddenException;
 import ru.practicum.explorewithme.exception.EntityIsNotAvailableException;
 import ru.practicum.explorewithme.exception.ModelNotFoundException;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,19 +60,5 @@ public class CommentPublicService {
             log.error("ModelNotFoundException");
             throw new ModelNotFoundException(commentId, Comment.class.getSimpleName());
         });
-    }
-
-    @Transactional
-    public void handleUseful(long eventId, long commentId, boolean isAdding) {
-        log.debug("Handle useful for event id: {}'s comment id: {}, is increase - {}", eventId, commentId, isAdding);
-        Comment comment = getCommentByEventId(eventId, commentId);
-        int useful = comment.getUseful();
-        if (isAdding) {
-            useful++;
-            commentRepository.updateUseful(useful, commentId);
-        } else {
-            useful--;
-            commentRepository.updateUseful(useful, commentId);
-        }
     }
 }

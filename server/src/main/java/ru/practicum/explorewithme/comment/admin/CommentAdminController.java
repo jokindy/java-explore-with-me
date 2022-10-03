@@ -3,9 +3,7 @@ package ru.practicum.explorewithme.comment.admin;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.comment.Comment;
 import ru.practicum.explorewithme.comment.dto.CommentDto;
-import ru.practicum.explorewithme.util.Mapper;
 
 @Slf4j
 @RestController
@@ -13,8 +11,7 @@ import ru.practicum.explorewithme.util.Mapper;
 @RequestMapping("/admin/comments")
 public class CommentAdminController {
 
-    private final Mapper mapper;
-    private final CommentAdminService commentService;
+    private final CommentAdminManager commentAdminManager;
 
     /**
      * Метод меняет статус коммента на PUBLISHED
@@ -23,8 +20,7 @@ public class CommentAdminController {
     @PatchMapping("/{commentId}/publish")
     public CommentDto publishComment(@PathVariable long commentId) {
         log.debug("Publish comment id: {}", commentId);
-        Comment comment = commentService.handleCommentStatus(commentId, true);
-        return mapper.map(comment, CommentDto.class);
+       return commentAdminManager.handleCommentStatus(commentId, true);
     }
 
     /**
@@ -34,8 +30,7 @@ public class CommentAdminController {
     @PatchMapping("/{commentId}/reject")
     public CommentDto rejectComment(@PathVariable long commentId) {
         log.debug("Reject comment id: {}", commentId);
-        Comment comment = commentService.handleCommentStatus(commentId, false);
-        return mapper.map(comment, CommentDto.class);
+        return commentAdminManager.handleCommentStatus(commentId, false);
     }
 
     /**
@@ -45,7 +40,7 @@ public class CommentAdminController {
     @DeleteMapping("/admin/comments/{commentId}")
     public String deleteComment(@PathVariable long commentId) {
         log.debug("Delete comment id: {}", commentId);
-        commentService.deleteComment(commentId);
+        commentAdminManager.deleteComment(commentId);
         return String.format("Comment id: %s is deleted", commentId);
     }
 }

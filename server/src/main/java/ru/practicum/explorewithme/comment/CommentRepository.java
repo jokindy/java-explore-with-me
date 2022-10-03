@@ -17,7 +17,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     void updateCommentStatus(CommentState state, long commentId);
 
     @Modifying
-    @Query(value = "update Comment c set c.useful = ?1 where c.id = ?2")
-    void updateUseful(int useful, long commentId);
+    @Query(value = "insert into comment_rating values (?1, ?2, ?3)", nativeQuery = true)
+    void rateComment(long commentId, long userId, boolean isLike);
 
 }

@@ -68,10 +68,19 @@ CREATE TABLE IF NOT EXISTS comments
     created   TIMESTAMP                               NOT NULL,
     positive  boolean                                 NOT NULL,
     state     VARCHAR                                 NOT NULL,
-    useful    INT                                     NOT NULL,
     CONSTRAINT pk_comment PRIMARY KEY (id),
     CONSTRAINT AUTHOR FOREIGN KEY (author_id) REFERENCES users (id),
     CONSTRAINT EVENT_COMMENT FOREIGN KEY (event_id) REFERENCES events (id)
+);
+
+CREATE TABLE IF NOT EXISTS comment_rating
+(
+    comment_id BIGINT  NOT NULL,
+    user_id    BIGINT  NOT NULL,
+    is_like    BOOLEAN NOT NULL,
+    UNIQUE (comment_id, user_id),
+    CONSTRAINT COMMENT_RATE FOREIGN KEY (comment_id) REFERENCES comments (id),
+    CONSTRAINT USER_RATE FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS compilations

@@ -3,11 +3,9 @@ package ru.practicum.explorewithme.comment.user;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.comment.Comment;
 import ru.practicum.explorewithme.comment.dto.CommentDto;
 import ru.practicum.explorewithme.comment.dto.NewCommentDto;
 import ru.practicum.explorewithme.comment.dto.UpdateCommentDto;
-import ru.practicum.explorewithme.util.Mapper;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -18,8 +16,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class CommentUserController {
 
-    private final CommentUserService commentUserService;
-    private final Mapper mapper;
+    private final CommentUserManager commentUserManager;
 
     /**
      * метод получает все комменты к событию пользователя
@@ -29,8 +26,7 @@ public class CommentUserController {
     public List<CommentDto> getEventComments(@PathVariable long userId,
                                              @PathVariable long eventId) {
         log.debug("Get event id: {}'s (owner id: {}) comments", eventId, userId);
-        List<Comment> comments = commentUserService.getEventComments(userId, eventId);
-        return mapper.mapList(comments, CommentDto.class);
+        return commentUserManager.getEventComments(userId, eventId);
     }
 
     /**
@@ -42,9 +38,7 @@ public class CommentUserController {
                                          @PathVariable long userId,
                                          @PathVariable long eventId) {
         log.debug("Post new comment to event id: {} by user id: {}", eventId, userId);
-        Comment comment = Comment.toEntity(commentDto, userId, eventId);
-        commentUserService.save(comment, userId, eventId);
-        return mapper.map(comment, CommentDto.class);
+        return commentUserManager.postCommentToEvent(commentDto, userId, eventId);
     }
 
     /**
@@ -56,8 +50,7 @@ public class CommentUserController {
                                          @PathVariable long userId,
                                          @PathVariable long eventId) {
         log.debug("Update comment to event id: {} by user id: {}", eventId, userId);
-        Comment updatedComment = commentUserService.update(dto, userId, eventId);
-        return mapper.map(updatedComment, CommentDto.class);
+        return commentUserManager.updateComment(dto, userId, eventId);
     }
 
     /**
@@ -69,7 +62,33 @@ public class CommentUserController {
                                      @PathVariable long eventId,
                                      @PathVariable long commentId) {
         log.debug("Delete comment id: {} by user id: {} to event id {}", commentId, userId, eventId);
-        commentUserService.deleteComment(userId, eventId, commentId);
+        commentUserManager.deleteComment(userId, eventId, commentId);
         return String.format("Comment id: %s is deleted", commentId);
+    }
+
+    /**
+     * Метод ставит лайк комменту
+     */
+
+    @PatchMapping("/{userId}/events/{eventId}/comments/{commentId}/like")
+    public String putLike(@PathVariable long userId,
+                          @PathVariable long eventId,
+                          @PathVariable long commentId) {
+        log.debug("Increase useful for event id: {}'s comment id: {}", eventId, commentId);
+        commentUserManager.handleLike(userId, eventId, commentId, true);
+        return String.format("You add like to comment id: %s", commentId);
+    }
+
+    /**
+     * Метод ставит дизлайк комменту
+     */
+
+    @PatchMapping("/{userId}/events/{eventId}/comments/{commentId}/dislike")
+    public String removeUseful(@PathVariable long userId,
+                               @PathVariable long eventId,
+                               @PathVariable long commentId) {
+        log.debug("Decrease useful for event id: {}'s comment id: {}", eventId, commentId);
+        commentUserManager.handleLike(userId, eventId, commentId, false);
+        return String.format("You add dislike to comment id: %s", commentId);
     }
 }

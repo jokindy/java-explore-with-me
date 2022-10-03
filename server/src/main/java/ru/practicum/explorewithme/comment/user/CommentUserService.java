@@ -7,7 +7,6 @@ import ru.practicum.explorewithme.comment.Comment;
 import ru.practicum.explorewithme.comment.CommentRepository;
 import ru.practicum.explorewithme.comment.CommentState;
 import ru.practicum.explorewithme.comment.common.CommentPublicService;
-import ru.practicum.explorewithme.comment.dto.UpdateCommentDto;
 import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.event.user.EventUserService;
@@ -17,7 +16,6 @@ import ru.practicum.explorewithme.request.Request;
 import ru.practicum.explorewithme.request.RequestStatus;
 import ru.practicum.explorewithme.request.RequestUserService;
 import ru.practicum.explorewithme.user.UserAdminService;
-import ru.practicum.explorewithme.util.Mapper;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -29,7 +27,6 @@ import java.util.List;
 @AllArgsConstructor
 public class CommentUserService {
 
-    private final Mapper mapper;
     private final EntityManager entityManager;
     private final UserAdminService userService;
     private final EventUserService eventService;
@@ -47,11 +44,8 @@ public class CommentUserService {
     }
 
     @Transactional
-    public Comment update(UpdateCommentDto dto, long userId, long eventId) {
-        log.debug("Updating comment id: {} by user id: {}", dto.getId(), userId);
-        Comment comment = new Comment();
-        mapper.map(commentPublicService.getComment(dto.getId()), comment);
-        mapper.map(dto, comment);
+    public void update(Comment comment, long userId, long eventId) {
+        log.debug("Updating comment id: {} by user id: {}", comment.getId(), userId);
         checkIds(userId, eventId);
         long commentId = comment.getId();
         Comment commentDb = commentPublicService.getComment(commentId);
@@ -64,7 +58,7 @@ public class CommentUserService {
             log.error("UpdateIsForbiddenException");
             throw new UpdateIsForbiddenException(String.format("Comment id: %s is the same", commentId));
         }
-        return commentRepository.save(comment);
+        commentRepository.save(comment);
     }
 
     public List<Comment> getEventComments(long userId, long eventId) {
@@ -78,6 +72,17 @@ public class CommentUserService {
         checkIds(userId, eventId);
         Comment comment = commentPublicService.getComment(commentId);
         commentRepository.delete(comment);
+    }
+
+    @Transactional
+    public void handleLike(long userId, long eventId, long commentId, boolean isLike) {
+        log.debug("Handle useful for event id: {}'s comment id: {}, is like - {}", eventId, commentId, isLike);
+        Comment comment = commentPublicService.getCommentByEventId(eventId, commentId);
+        if (comment.getAuthorId() == userId) {
+            log.error("CommentingIsForbiddenException");
+            throw new CommentingIsForbiddenException("You can't rate your comment");
+        }
+        commentRepository.rateComment(commentId, userId, isLike);
     }
 
     private void checkIds(long userId, long eventId) {

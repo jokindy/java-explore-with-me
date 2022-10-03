@@ -12,6 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -41,22 +42,23 @@ public class Comment {
     @Column(nullable = false)
     private boolean positive;
 
-    @Column(nullable = false)
-    private int useful;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CommentState state;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ToString.Exclude
     private User author;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ToString.Exclude
     private Event event;
+
+    @ElementCollection
+    @CollectionTable(name = "comment_rating", joinColumns = @JoinColumn(name = "comment_id"))
+    private Set<CommentRating> commentRatings;
 
     public static Comment toEntity(NewCommentDto dto, long userId, long eventId) {
         Comment comment = new Comment();
@@ -78,7 +80,6 @@ public class Comment {
                 && getAuthorId() == comment.getAuthorId()
                 && getEventId() == comment.getEventId()
                 && isPositive() == comment.isPositive()
-                && getUseful() == comment.getUseful()
                 && Objects.equals(getContent(), comment.getContent())
                 && Objects.equals(getCreated(), comment.getCreated())
                 && getState() == comment.getState();
@@ -87,6 +88,6 @@ public class Comment {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getAuthorId(), getEventId(), getContent(),
-                getCreated(), isPositive(), getUseful(), getState());
+                getCreated(), isPositive(), getState());
     }
 }
