@@ -4,7 +4,6 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Component;
 import ru.practicum.explorewithme.event.Event;
-import ru.practicum.explorewithme.event.EventClient;
 import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.request.RequestRepository;
 
@@ -14,11 +13,9 @@ import java.time.LocalDateTime;
 public class EventMapper extends ModelMapper {
 
     private final RequestRepository requestRepository;
-    private final EventClient eventClient;
 
-    public EventMapper(RequestRepository requestRepository, EventClient eventClient) {
+    public EventMapper(RequestRepository requestRepository) {
         this.requestRepository = requestRepository;
-        this.eventClient = eventClient;
         setUp();
     }
 
@@ -32,12 +29,18 @@ public class EventMapper extends ModelMapper {
     }
 
 
-    public EventFullDto mapToFullDto(Event event) {
+    public EventFullDto mapToFullDto(Event event, int views) {
         EventFullDto eventDto = super.map(event, EventFullDto.class);
         int confirmedRequests = requestRepository.getConfirmedRequests(event.getId());
         eventDto.setConfirmedRequests(confirmedRequests);
-        String uri = "/events/" + event.getId();
-        Integer views = (Integer) eventClient.getViews(uri);
+        eventDto.setViews(views);
+        return eventDto;
+    }
+
+    public EventShortDto mapToShortDto(Event event, int views) {
+        EventShortDto eventDto = super.map(event, EventShortDto.class);
+        int confirmedRequests = requestRepository.getConfirmedRequests(event.getId());
+        eventDto.setConfirmedRequests(confirmedRequests);
         eventDto.setViews(views);
         return eventDto;
     }

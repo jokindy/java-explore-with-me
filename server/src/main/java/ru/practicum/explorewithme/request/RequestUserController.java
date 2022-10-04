@@ -13,30 +13,30 @@ import java.util.List;
 @AllArgsConstructor
 public class RequestUserController {
 
-    private final RequestUserService requestUserService;
+    private final RequestUserManager requestUserManager;
 
     @GetMapping("/{userId}/requests")
     public List<ParticipantRequestDto> getRequestsByUser(@PathVariable long userId) {
         log.debug("Getting requests by user id: {}", userId);
-        return requestUserService.getRequests(userId);
+        return requestUserManager.getRequests(userId);
     }
 
     @PostMapping("/{userId}/requests")
     public ParticipantRequestDto postRequestsByUser(@PathVariable long userId, @RequestParam long eventId) {
         log.debug("Post request by user id: {} to event id: {}", userId, eventId);
-        return requestUserService.save(userId, eventId);
+        return requestUserManager.saveRequest(userId, eventId);
     }
 
     @PatchMapping("/{userId}/requests/{reqId}/cancel")
     public ParticipantRequestDto cancelRequestByUser(@PathVariable long userId, @PathVariable long reqId) {
         log.debug("Cancel request id: {} by user id: {}", reqId, userId);
-        return requestUserService.cancelRequest(userId, reqId);
+        return requestUserManager.cancelRequest(userId, reqId);
     }
 
     @GetMapping("/{userId}/events/{eventId}/requests")
     public List<ParticipantRequestDto> getRequestsByEventId(@PathVariable long userId, @PathVariable long eventId) {
         log.debug("Get event id: {}'s requests by user id: {}", eventId, userId);
-        return requestUserService.getRequestsByEventId(userId, eventId);
+        return requestUserManager.getRequestsByEventId(userId, eventId);
     }
 
     @PatchMapping("/{userId}/events/{eventId}/requests/{reqId}/confirm")
@@ -44,7 +44,7 @@ public class RequestUserController {
                                                          @PathVariable long eventId,
                                                          @PathVariable long reqId) {
         log.debug("Confirm request id: {} to event id: {} by user id: {}", reqId, eventId, userId);
-        return requestUserService.handleRequest(userId, eventId, reqId, true);
+        return requestUserManager.handleRequestStatus(userId, eventId, reqId, true);
     }
 
     @PatchMapping("/{userId}/events/{eventId}/requests/{reqId}/reject")
@@ -52,6 +52,6 @@ public class RequestUserController {
                                                         @PathVariable long eventId,
                                                         @PathVariable long reqId) {
         log.debug("Reject request id: {} to event id: {} by user id: {}", reqId, eventId, userId);
-        return requestUserService.handleRequest(userId, eventId, reqId, false);
+        return requestUserManager.handleRequestStatus(userId, eventId, reqId, false);
     }
 }

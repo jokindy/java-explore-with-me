@@ -2,15 +2,15 @@ package ru.practicum.explorewithme.category.common;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.category.Category;
 import ru.practicum.explorewithme.category.CategoryRepository;
-import ru.practicum.explorewithme.category.dto.CategoryDto;
 import ru.practicum.explorewithme.exception.ModelNotFoundException;
-import ru.practicum.explorewithme.util.PageMaker;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -18,21 +18,17 @@ import java.util.stream.Collectors;
 public class CategoryPublicService {
 
     private final CategoryRepository categoryRepository;
-    private final PageMaker<Category> pageMaker;
 
-    public CategoryDto get(long categoryId) {
+    public Category get(long categoryId) {
         log.debug("Getting category id: {}", categoryId);
         checkCategoryId(categoryId);
-        Category category = categoryRepository.findById(categoryId).get();
-        return CategoryDto.construct(category);
+        return categoryRepository.findById(categoryId).get();
     }
 
-    public List<CategoryDto> getAll(int from, int size) {
+    public List<Category> getAll(int from, int size) {
         log.debug("Getting all categories");
-        List<Category> categories = categoryRepository.findAll();
-        return pageMaker.getPage(from, size, categories).getContent().stream()
-                .map(CategoryDto::construct)
-                .collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(from, size, Sort.by("id").ascending());
+        return categoryRepository.findAll(pageable).getContent();
     }
 
     public void checkCategoryId(long categoryId) {

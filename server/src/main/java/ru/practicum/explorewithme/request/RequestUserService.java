@@ -7,13 +7,12 @@ import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.event.user.EventUserService;
 import ru.practicum.explorewithme.exception.*;
-import ru.practicum.explorewithme.request.dto.ParticipantRequestDto;
 import ru.practicum.explorewithme.user.UserAdminService;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -23,8 +22,10 @@ public class RequestUserService {
     private final RequestRepository requestRepository;
     private final UserAdminService userAdminService;
     private final EventUserService eventService;
+    private final EntityManager entityManager;
 
-    public ParticipantRequestDto save(long userId, long eventId) {
+    @Transactional
+    public Request save(long userId, long eventId) {
         log.debug("Saving request by user id: {} to event id: {}", userId, eventId);
         Event event = eventService.getEventById(eventId);
         userAdminService.checkUserId(userId);
@@ -50,19 +51,19 @@ public class RequestUserService {
                 ? new Request(userId, eventId, RequestStatus.PENDING)
                 : new Request(userId, eventId, RequestStatus.CONFIRMED);
         requestRepository.save(request);
-        return ParticipantRequestDto.construct(request);
+        entityManager.refresh(request);
+        return request;
     }
 
-    public List<ParticipantRequestDto> getRequests(long userId) {
+    public List<Request> getRequests(long userId) {
         log.debug("Getting requests user id: {}", userId);
         userAdminService.checkUserId(userId);
-        return requestRepository.findAllByRequesterId(userId).stream()
-                .map(ParticipantRequestDto::construct)
-                .collect(Collectors.toList());
+        return requestRepository.findAllByRequesterId(userId);
+
     }
 
     @Transactional
-    public ParticipantRequestDto cancelRequest(long userId, long reqId) {
+    public Request cancelRequest(long userId, long reqId) {
         log.debug("Cancel request id: {} by user id: {}", reqId, userId);
         userAdminService.checkUserId(userId);
         Request request = getRequest(reqId);
@@ -78,7 +79,7 @@ public class RequestUserService {
         }
         request.setStatus(RequestStatus.CANCELED);
         requestRepository.save(request);
-        return ParticipantRequestDto.construct(request);
+        return request;
     }
 
     public Request getRequest(long reqId) {
@@ -91,15 +92,13 @@ public class RequestUserService {
         return optionalRequest.get();
     }
 
-    public List<ParticipantRequestDto> getRequestsByEventId(long userId, long eventId) {
+    public List<Request> getRequestsByEventId(long userId, long eventId) {
         log.debug("Getting event id: {}'s requests by user id: {}", eventId, userId);
         eventService.getEventByOwnerId(userId, eventId);
-        return eventService.getEventById(eventId).getRequests().stream()
-                .map(ParticipantRequestDto::construct)
-                .collect(Collectors.toList());
+        return eventService.getEventById(eventId).getRequests();
     }
 
-    public ParticipantRequestDto handleRequest(long userId, long eventId, long reqId, boolean isApproved) {
+    public Request handleRequest(long userId, long eventId, long reqId, boolean isApproved) {
         log.debug("Change request id: {}'s status to event id: {} by user id: {}", reqId, eventId, userId);
         eventService.getEventByOwnerId(userId, eventId);
         List<Request> requests = eventService.getEventById(eventId).getRequests();
@@ -120,6 +119,6 @@ public class RequestUserService {
             request.setStatus(RequestStatus.REJECTED);
         }
         requestRepository.save(request);
-        return ParticipantRequestDto.construct(request);
+        return request;
     }
 }

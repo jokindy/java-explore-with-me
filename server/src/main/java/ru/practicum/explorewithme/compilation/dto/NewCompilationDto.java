@@ -3,7 +3,6 @@ package ru.practicum.explorewithme.compilation.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import ru.practicum.explorewithme.compilation.Compilation;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -19,11 +18,4 @@ public class NewCompilationDto {
     private boolean pinned;
 
     private List<Long> events;
-
-    public static Compilation toDomain(NewCompilationDto dto) {
-        Compilation compilation = new Compilation();
-        compilation.setTitle(dto.getTitle());
-        compilation.setPinned(dto.isPinned());
-        return compilation;
-    }
 }

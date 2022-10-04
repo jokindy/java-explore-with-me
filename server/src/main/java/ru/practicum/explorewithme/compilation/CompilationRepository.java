@@ -1,5 +1,6 @@
 package ru.practicum.explorewithme.compilation;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,5 +21,5 @@ public interface CompilationRepository extends JpaRepository<Compilation, Long> 
     @Query(value = "update Compilation c set c.pinned = ?1 where c.id = ?2")
     void setCompilationPinned(boolean pinned, long compId);
 
-    List<Compilation> findAllByPinned(boolean pinned);
+    List<Compilation> findAllByPinned(boolean pinned, Pageable pageable);
 }

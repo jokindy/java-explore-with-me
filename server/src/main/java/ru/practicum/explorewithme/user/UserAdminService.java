@@ -2,16 +2,13 @@ package ru.practicum.explorewithme.user;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.exception.ModelNotFoundException;
-import ru.practicum.explorewithme.user.dto.UserDto;
-import ru.practicum.explorewithme.util.PageMaker;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -19,31 +16,21 @@ import java.util.stream.Collectors;
 public class UserAdminService {
 
     private final UserRepository userRepository;
-    private final PageMaker<User> pageMaker;
 
-    public UserDto save(UserDto dto) {
-        User user = UserDto.toDomain(dto);
+    public User save(User user) {
+        log.debug("Saving new user to db: {}", user);
         userRepository.save(user);
-        return UserDto.construct(user);
+        return user;
     }
 
-    public List<UserDto> getUsers(Long[] ids, int from, int size) {
+    public List<User> getUsers(Long[] ids, int from, int size) {
         log.debug("Getting users id: {}", (Object) ids);
-        List<Long> longList = Arrays.asList(ids);
-        List<User> users = longList.stream()
-                .map(this::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        return pageMaker.getPage(from, size, users).stream()
-                .map(UserDto::construct)
-                .collect(Collectors.toList());
-    }
-
-
-    public User get(long userId) {
-        log.debug("Getting user id: {}", userId);
-        Optional<User> userOptional = userRepository.findById(userId);
-        return userOptional.orElse(null);
+        Pageable pageable = PageRequest.of(from, size, Sort.by("id").ascending());
+        if (ids == null) {
+            return userRepository.findAll(pageable).getContent();
+        } else {
+            return userRepository.findAllByIds(ids, pageable);
+        }
     }
 
     public void delete(long userId) {

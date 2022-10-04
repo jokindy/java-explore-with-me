@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.EventClient;
 import ru.practicum.explorewithme.event.dto.EventFullDto;
 import ru.practicum.explorewithme.event.dto.EventShortDto;
@@ -23,7 +22,7 @@ import java.util.List;
 public class EventPublicController {
 
     private final EventClient client;
-    private final EventPublicService eventPublicService;
+    private final EventPublicManager eventPublicManager;
 
     @GetMapping
     public List<EventShortDto> getEvents(@RequestParam(required = false) String text,
@@ -40,15 +39,15 @@ public class EventPublicController {
                                          HttpServletRequest request) {
         log.debug("Get events");
         client.addRequest(request);
-        List<Event> events = eventPublicService.getEvents(text, categories, paid, rangeStart,
-                rangeEnd, onlyAvailable);
-        return eventPublicService.getSortedEvents(events, from, size, sort);
+        return eventPublicManager.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+
     }
 
     @GetMapping("/{eventId}")
     public EventFullDto getEventById(@PathVariable long eventId, HttpServletRequest request) {
         log.debug("Get event id: {}", eventId);
+        EventFullDto dto = eventPublicManager.getEventById(eventId);
         client.addRequest(request);
-        return eventPublicService.getEventFullDto(eventId);
+        return dto;
     }
 }

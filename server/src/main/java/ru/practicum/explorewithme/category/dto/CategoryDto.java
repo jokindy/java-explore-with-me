@@ -24,10 +24,4 @@ public class CategoryDto {
                 category.getName());
     }
 
-    public static Category toDomain(CategoryDto categoryDto) {
-        Category category = new Category();
-        category.setId(categoryDto.getId());
-        category.setName(categoryDto.getName());
-        return category;
-    }
 }

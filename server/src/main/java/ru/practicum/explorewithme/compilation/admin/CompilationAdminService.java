@@ -6,12 +6,9 @@ import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.compilation.Compilation;
 import ru.practicum.explorewithme.compilation.CompilationRepository;
 import ru.practicum.explorewithme.compilation.common.CompilationPublicService;
-import ru.practicum.explorewithme.compilation.dto.CompilationDto;
-import ru.practicum.explorewithme.compilation.dto.NewCompilationDto;
 import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.user.EventUserService;
 import ru.practicum.explorewithme.exception.UpdateIsForbiddenException;
-import ru.practicum.explorewithme.util.Mapper;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -26,18 +23,14 @@ public class CompilationAdminService {
     private final CompilationPublicService compilationPublicService;
     private final CompilationRepository compilationRepository;
     private final EventUserService eventService;
-    private final Mapper mapper;
 
-    public CompilationDto save(NewCompilationDto compilationDto) {
-        log.debug("Saving compilation to DB: {} with events: {}", compilationDto, compilationDto.getEvents());
-        List<Long> eventsId = compilationDto.getEvents();
-        Compilation compilation = NewCompilationDto.toDomain(compilationDto);
+    public Compilation save(Compilation compilation, List<Long> eventsId) {
+        log.debug("Saving compilation to DB: {} with events: {}", compilation, eventsId);
         Set<Event> events = eventsId.stream()
                 .map(eventService::getEventById)
                 .collect(Collectors.toSet());
         compilation.setEvents(events);
-        compilationRepository.save(compilation);
-        return mapper.map(compilation, CompilationDto.class);
+        return compilationRepository.save(compilation);
     }
 
     public void deleteCompilation(long compId) {
@@ -64,11 +57,11 @@ public class CompilationAdminService {
     }
 
     @Transactional
-    public void handleCompilationPin(long compId, boolean isDeleting) {
-        log.debug("Handle compilation id: {} pinned, is pinned - {}", compId, isDeleting);
+    public void handleCompilationPin(long compId, boolean isPinned) {
+        log.debug("Handle compilation id: {} pinned, is pinned - {}", compId, isPinned);
         Compilation compilation = compilationPublicService.getCompilation(compId);
         boolean pinned = compilation.isPinned();
-        if (isDeleting) {
+        if (isPinned) {
             if (pinned) {
                 compilationRepository.setCompilationPinned(false, compId);
             } else {
