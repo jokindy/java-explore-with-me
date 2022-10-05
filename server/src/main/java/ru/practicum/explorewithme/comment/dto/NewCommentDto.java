@@ -3,7 +3,7 @@ package ru.practicum.explorewithme.comment.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import ru.practicum.explorewithme.comment.CommentState;
+import ru.practicum.explorewithme.comment.CommentModerationStatus;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -21,5 +21,5 @@ public class NewCommentDto {
     @NotNull
     private Boolean positive;
 
-    private CommentState state = CommentState.PENDING;
+    private CommentModerationStatus state = CommentModerationStatus.PENDING;
 }

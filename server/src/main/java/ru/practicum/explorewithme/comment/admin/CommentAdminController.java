@@ -11,7 +11,7 @@ import ru.practicum.explorewithme.comment.dto.CommentDto;
 @RequestMapping("/admin/comments")
 public class CommentAdminController {
 
-    private final CommentAdminManager commentAdminManager;
+    private final CommentAdminApiManager commentAdminApiManager;
 
     /**
      * Метод меняет статус коммента на PUBLISHED
@@ -20,7 +20,7 @@ public class CommentAdminController {
     @PatchMapping("/{commentId}/publish")
     public CommentDto publishComment(@PathVariable long commentId) {
         log.debug("Publish comment id: {}", commentId);
-       return commentAdminManager.handleCommentStatus(commentId, true);
+       return commentAdminApiManager.handleCommentStatus(commentId, true);
     }
 
     /**
@@ -30,7 +30,7 @@ public class CommentAdminController {
     @PatchMapping("/{commentId}/reject")
     public CommentDto rejectComment(@PathVariable long commentId) {
         log.debug("Reject comment id: {}", commentId);
-        return commentAdminManager.handleCommentStatus(commentId, false);
+        return commentAdminApiManager.handleCommentStatus(commentId, false);
     }
 
     /**
@@ -40,7 +40,7 @@ public class CommentAdminController {
     @DeleteMapping("/admin/comments/{commentId}")
     public String deleteComment(@PathVariable long commentId) {
         log.debug("Delete comment id: {}", commentId);
-        commentAdminManager.deleteComment(commentId);
+        commentAdminApiManager.deleteComment(commentId);
         return String.format("Comment id: %s is deleted", commentId);
     }
 }

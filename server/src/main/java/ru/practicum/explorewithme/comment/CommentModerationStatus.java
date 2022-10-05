@@ -1,7 +1,7 @@
 package ru.practicum.explorewithme.comment;
 
-public enum CommentState {
+public enum CommentModerationStatus {
     PENDING,
-    PUBLISHED,
+    APPROVED,
     REJECTED
 }

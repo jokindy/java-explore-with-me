@@ -8,7 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.comment.Comment;
 import ru.practicum.explorewithme.comment.CommentRepository;
-import ru.practicum.explorewithme.comment.CommentState;
+import ru.practicum.explorewithme.comment.CommentModerationStatus;
 import ru.practicum.explorewithme.exception.CommentingIsForbiddenException;
 import ru.practicum.explorewithme.exception.EntityIsNotAvailableException;
 import ru.practicum.explorewithme.exception.ModelNotFoundException;
@@ -23,7 +23,7 @@ public class CommentPublicService {
 
     private final CommentRepository commentRepository;
 
-    public List<Comment> getComments(long eventId, int from, int size, CommentSort sort, Boolean positive) {
+    public List<Comment> getComments(long eventId, int from, int size, CommentSortKey sort, Boolean positive) {
         log.debug("Getting event id: {}'s comments by {}, is positive - {}", eventId, sort, positive);
         Pageable pageable;
         switch (sort) {
@@ -36,7 +36,7 @@ public class CommentPublicService {
             default:
                 pageable = PageRequest.of(from, size, Sort.by("id").descending());
         }
-        return commentRepository.findAllByEventIdAndStateAndPositive(eventId, CommentState.PUBLISHED,
+        return commentRepository.findAllByEventIdAndStateAndPositive(eventId, CommentModerationStatus.APPROVED,
                 positive, pageable);
     }
 
@@ -47,7 +47,7 @@ public class CommentPublicService {
             throw new CommentingIsForbiddenException(String.format("Comment id: %s isn't for event id: %s",
                     commentId, eventId));
         }
-        if (!comment.getState().equals(CommentState.PUBLISHED)) {
+        if (!comment.getState().equals(CommentModerationStatus.APPROVED)) {
             throw new EntityIsNotAvailableException(String.format("Comment id: %s is not published yet", commentId));
         }
         return comment;
@@ -55,8 +55,8 @@ public class CommentPublicService {
 
     public Comment getComment(long commentId) {
         log.debug("Getting comment id: {}", commentId);
-        Optional<Comment> optionalComment = commentRepository.findById(commentId);
-        return optionalComment.orElseThrow(() -> {
+        Optional<Comment> commentO = commentRepository.findById(commentId);
+        return commentO.orElseThrow(() -> {
             log.error("ModelNotFoundException");
             throw new ModelNotFoundException(commentId, Comment.class.getSimpleName());
         });

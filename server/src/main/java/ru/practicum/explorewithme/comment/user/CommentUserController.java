@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class CommentUserController {
 
-    private final CommentUserManager commentUserManager;
+    private final CommentUserApiManager commentUserApiManager;
 
     /**
      * метод получает все комменты к событию пользователя
@@ -26,7 +26,7 @@ public class CommentUserController {
     public List<CommentDto> getEventComments(@PathVariable long userId,
                                              @PathVariable long eventId) {
         log.debug("Get event id: {}'s (owner id: {}) comments", eventId, userId);
-        return commentUserManager.getEventComments(userId, eventId);
+        return commentUserApiManager.getEventComments(userId, eventId);
     }
 
     /**
@@ -38,7 +38,7 @@ public class CommentUserController {
                                          @PathVariable long userId,
                                          @PathVariable long eventId) {
         log.debug("Post new comment to event id: {} by user id: {}", eventId, userId);
-        return commentUserManager.postCommentToEvent(commentDto, userId, eventId);
+        return commentUserApiManager.postCommentToEvent(commentDto, userId, eventId);
     }
 
     /**
@@ -50,7 +50,7 @@ public class CommentUserController {
                                          @PathVariable long userId,
                                          @PathVariable long eventId) {
         log.debug("Update comment to event id: {} by user id: {}", eventId, userId);
-        return commentUserManager.updateComment(dto, userId, eventId);
+        return commentUserApiManager.updateComment(dto, userId, eventId);
     }
 
     /**
@@ -62,7 +62,7 @@ public class CommentUserController {
                                      @PathVariable long eventId,
                                      @PathVariable long commentId) {
         log.debug("Delete comment id: {} by user id: {} to event id {}", commentId, userId, eventId);
-        commentUserManager.deleteComment(userId, eventId, commentId);
+        commentUserApiManager.deleteComment(userId, eventId, commentId);
         return String.format("Comment id: %s is deleted", commentId);
     }
 
@@ -75,7 +75,7 @@ public class CommentUserController {
                           @PathVariable long eventId,
                           @PathVariable long commentId) {
         log.debug("Increase useful for event id: {}'s comment id: {}", eventId, commentId);
-        commentUserManager.handleLike(userId, eventId, commentId, true);
+        commentUserApiManager.handleLike(userId, eventId, commentId, true);
         return String.format("You add like to comment id: %s", commentId);
     }
 
@@ -88,7 +88,7 @@ public class CommentUserController {
                                @PathVariable long eventId,
                                @PathVariable long commentId) {
         log.debug("Decrease useful for event id: {}'s comment id: {}", eventId, commentId);
-        commentUserManager.handleLike(userId, eventId, commentId, false);
+        commentUserApiManager.handleLike(userId, eventId, commentId, false);
         return String.format("You add dislike to comment id: %s", commentId);
     }
 }

@@ -8,7 +8,7 @@ import ru.practicum.explorewithme.util.Mapper;
 
 @Service
 @AllArgsConstructor
-public class CommentAdminManager {
+public class CommentAdminApiManager {
 
     private final Mapper mapper;
     private final CommentAdminService commentService;

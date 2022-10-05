@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/events")
 public class CommentPublicController {
 
-    private final CommentPublicManager commentPublicManager;
+    private final CommentPublicApiManager commentPublicApiManager;
 
     /**
      * Метод возвращает только опубликованные комменты к событию с сортировкой по полезности или дате
@@ -24,12 +24,12 @@ public class CommentPublicController {
     
     @GetMapping("/{eventId}/comments")
     public List<CommentDto> getEventComments(@PathVariable long eventId,
-                                             @RequestParam(defaultValue = "ID") CommentSort sort,
+                                             @RequestParam(defaultValue = "DEFAULT") CommentSortKey sort,
                                              @RequestParam(required = false) Boolean positive,
                                              @Valid @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                              @Valid @Positive @RequestParam(defaultValue = "10") int size) {
         log.debug("Get event id: {}'s comments", eventId);
-        return commentPublicManager.getComments(eventId, sort, positive, from, size);
+        return commentPublicApiManager.getComments(eventId, sort, positive, from, size);
     }
 
     /**
@@ -40,6 +40,6 @@ public class CommentPublicController {
     public CommentDto getEventComment(@PathVariable long eventId,
                                       @PathVariable long commentId) {
         log.debug("Get event id: {}'s comment id: {}", eventId, commentId);
-        return commentPublicManager.getComment(eventId, commentId);
+        return commentPublicApiManager.getComment(eventId, commentId);
     }
 }

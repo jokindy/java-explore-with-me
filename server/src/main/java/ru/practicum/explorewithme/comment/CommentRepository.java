@@ -9,12 +9,12 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findAllByEventIdAndStateAndPositive(long eventId, CommentState state,
+    List<Comment> findAllByEventIdAndStateAndPositive(long eventId, CommentModerationStatus state,
                                                       Boolean positive, Pageable pageable);
 
     @Modifying
-    @Query(value = "update Comment c set c.state = ?1 where c.id = ?2")
-    void updateCommentStatus(CommentState state, long commentId);
+    @Query(value = "update Comment c set c.state = ?2 where c.id = ?1")
+    void updateCommentStatus(long commentId, CommentModerationStatus status);
 
     @Modifying
     @Query(value = "insert into comment_rating values (?1, ?2, ?3)", nativeQuery = true)

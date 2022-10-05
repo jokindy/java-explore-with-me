@@ -1,7 +1,7 @@
 package ru.practicum.explorewithme.comment.common;
 
-public enum CommentSort {
+public enum CommentSortKey {
     DATE,
     USEFUL,
-    ID
+    DEFAULT
 }

@@ -2,10 +2,11 @@ package ru.practicum.explorewithme.comment.user;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.comment.Comment;
+import ru.practicum.explorewithme.comment.CommentModerationStatus;
 import ru.practicum.explorewithme.comment.CommentRepository;
-import ru.practicum.explorewithme.comment.CommentState;
 import ru.practicum.explorewithme.comment.common.CommentPublicService;
 import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.EventState;
@@ -49,7 +50,7 @@ public class CommentUserService {
         checkIds(userId, eventId);
         long commentId = comment.getId();
         Comment commentDb = commentPublicService.getComment(commentId);
-        if (!commentDb.getState().equals(CommentState.PENDING)) {
+        if (!commentDb.getState().equals(CommentModerationStatus.PENDING)) {
             log.error("UpdateIsForbiddenException");
             throw new UpdateIsForbiddenException(String.format("Comment id: %s can't be update because it's published",
                     commentId));
@@ -82,7 +83,12 @@ public class CommentUserService {
             log.error("CommentingIsForbiddenException");
             throw new CommentingIsForbiddenException("You can't rate your comment");
         }
-        commentRepository.rateComment(commentId, userId, isLike);
+        try {
+            commentRepository.rateComment(commentId, userId, isLike);
+        } catch (DataIntegrityViolationException e) {
+            log.error("CommentingIsForbiddenException");
+            throw new CommentingIsForbiddenException(String.format("You already rated comment id: %s", commentId));
+        }
     }
 
     private void checkIds(long userId, long eventId) {

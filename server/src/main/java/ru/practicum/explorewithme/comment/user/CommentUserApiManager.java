@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class CommentUserManager {
+public class CommentUserApiManager {
 
     private final Mapper mapper;
     private final CommentUserService commentUserService;
@@ -25,7 +25,9 @@ public class CommentUserManager {
     }
 
     public CommentDto postCommentToEvent(NewCommentDto commentDto, long userId, long eventId) {
-        Comment comment = Comment.toEntity(commentDto, userId, eventId);
+        Comment comment = mapper.map(commentDto, Comment.class);
+        comment.setEventId(eventId);
+        comment.setAuthorId(userId);
         commentUserService.save(comment, userId, eventId);
         return mapper.map(comment, CommentDto.class);
     }

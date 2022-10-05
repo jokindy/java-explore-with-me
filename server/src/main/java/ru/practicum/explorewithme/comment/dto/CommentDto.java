@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.explorewithme.comment.CommentRating;
-import ru.practicum.explorewithme.comment.CommentState;
+import ru.practicum.explorewithme.comment.CommentModerationStatus;
 import ru.practicum.explorewithme.event.dto.EventCommentDto;
 import ru.practicum.explorewithme.user.dto.UserShortDto;
 
@@ -22,7 +22,7 @@ public class CommentDto {
     private boolean positive;
     private UserShortDto author;
     private EventCommentDto event;
-    private CommentState state;
+    private CommentModerationStatus state;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;

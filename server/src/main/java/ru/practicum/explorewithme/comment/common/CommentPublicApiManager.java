@@ -10,13 +10,13 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class CommentPublicManager {
+public class CommentPublicApiManager {
 
     private final Mapper mapper;
     private final CommentPublicService commentPublicService;
 
     public List<CommentDto> getComments(long eventId,
-                                        CommentSort sort,
+                                        CommentSortKey sort,
                                         Boolean positive,
                                         int from,
                                         int size) {

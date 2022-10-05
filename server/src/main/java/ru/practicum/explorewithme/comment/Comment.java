@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.practicum.explorewithme.comment.dto.NewCommentDto;
 import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.user.User;
 
@@ -44,7 +43,7 @@ public class Comment {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CommentState state;
+    private CommentModerationStatus state;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", referencedColumnName = "id", insertable = false, updatable = false)
@@ -59,17 +58,6 @@ public class Comment {
     @ElementCollection
     @CollectionTable(name = "comment_rating", joinColumns = @JoinColumn(name = "comment_id"))
     private Set<CommentRating> commentRatings;
-
-    public static Comment toEntity(NewCommentDto dto, long userId, long eventId) {
-        Comment comment = new Comment();
-        comment.setAuthorId(userId);
-        comment.setEventId(eventId);
-        comment.setPositive(dto.getPositive());
-        comment.setContent(dto.getContent());
-        comment.setCreated(dto.getCreated());
-        comment.setState(dto.getState());
-        return comment;
-    }
 
     @Override
     public boolean equals(Object o) {
