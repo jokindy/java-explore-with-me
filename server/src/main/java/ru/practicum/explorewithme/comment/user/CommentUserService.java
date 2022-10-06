@@ -11,8 +11,7 @@ import ru.practicum.explorewithme.comment.common.CommentPublicService;
 import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.event.user.EventUserService;
-import ru.practicum.explorewithme.exception.CommentingIsForbiddenException;
-import ru.practicum.explorewithme.exception.UpdateIsForbiddenException;
+import ru.practicum.explorewithme.exception.ForbiddenException;
 import ru.practicum.explorewithme.request.Request;
 import ru.practicum.explorewithme.request.RequestStatus;
 import ru.practicum.explorewithme.request.RequestUserService;
@@ -52,12 +51,11 @@ public class CommentUserService {
         Comment commentDb = commentPublicService.getComment(commentId);
         if (!commentDb.getState().equals(CommentModerationStatus.PENDING)) {
             log.error("UpdateIsForbiddenException");
-            throw new UpdateIsForbiddenException(String.format("Comment id: %s can't be update because it's published",
-                    commentId));
+            throw ForbiddenException.updateNotPublishedComment(commentId);
         }
         if (commentDb.equals(comment)) {
             log.error("UpdateIsForbiddenException");
-            throw new UpdateIsForbiddenException(String.format("Comment id: %s is the same", commentId));
+            throw ForbiddenException.updateSameComment(commentId);
         }
         commentRepository.save(comment);
     }
@@ -81,13 +79,13 @@ public class CommentUserService {
         Comment comment = commentPublicService.getCommentByEventId(eventId, commentId);
         if (comment.getAuthorId() == userId) {
             log.error("CommentingIsForbiddenException");
-            throw new CommentingIsForbiddenException("You can't rate your comment");
+            throw ForbiddenException.rateOwnComment();
         }
         try {
             commentRepository.rateComment(commentId, userId, isLike);
         } catch (DataIntegrityViolationException e) {
             log.error("CommentingIsForbiddenException");
-            throw new CommentingIsForbiddenException(String.format("You already rated comment id: %s", commentId));
+            throw ForbiddenException.rateTwice(commentId);
         }
     }
 
@@ -98,24 +96,24 @@ public class CommentUserService {
         long initiatorId = event.getInitiatorId();
         if (initiatorId == userId) {
             log.error("CommentingIsForbiddenException");
-            throw new CommentingIsForbiddenException("You can't leave comment on your event");
+            throw ForbiddenException.commentForOwnEvent();
         }
         if (event.getState().equals(EventState.PENDING)) {
             log.error("CommentingIsForbiddenException");
-            throw new CommentingIsForbiddenException("You can't leave comment on unpublished event");
+            throw ForbiddenException.commentToUnpublishedEvent();
         }
         if (event.getEventDate().isAfter(LocalDateTime.now())) {
             log.error("CommentingIsForbiddenException");
-            throw new CommentingIsForbiddenException("You can't leave comment on future event");
+            throw ForbiddenException.commentToFutureEvent();
         }
         Request request = requestUserService.getRequest(userId, eventId);
         if (request == null) {
             log.error("CommentingIsForbiddenException");
-            throw new CommentingIsForbiddenException("You can't leave comment on event because you aren't participant");
+            throw ForbiddenException.commentByNotParticipant();
         }
         if (request.getStatus() != RequestStatus.CONFIRMED) {
             log.error("CommentingIsForbiddenException");
-            throw new CommentingIsForbiddenException("You can't leave comment on event because you aren't confirmed to event");
+            throw ForbiddenException.commentByRejectedParticipant();
         }
     }
 }

@@ -6,7 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.event.user.EventUserService;
-import ru.practicum.explorewithme.exception.*;
+import ru.practicum.explorewithme.exception.ForbiddenException;
+import ru.practicum.explorewithme.exception.ModelNotFoundException;
 import ru.practicum.explorewithme.request.dto.ParticipantRequestDto;
 import ru.practicum.explorewithme.user.UserAdminService;
 
@@ -30,20 +31,18 @@ public class RequestUserService {
         userAdminService.checkUserId(userId);
         if (event.getInitiatorId() == userId) {
             log.error("UserIsInitiatorException");
-            throw new UserIsInitiatorException("You can't make request on your event");
+            throw ForbiddenException.userIsInitiator(userId, eventId);
         }
         if (!event.getState().equals(EventState.PUBLISHED)) {
             log.error("EventIsNotAvailableException");
-            throw new EntityIsNotAvailableException(String.format("You can't make request to event id: %s because " +
-                    "this event is not published", eventId));
+            throw ForbiddenException.eventIsNotPublished(eventId);
         }
         int confirmedRequests = requestRepository.getConfirmedRequests(eventId);
         int participantLimit = event.getParticipantLimit();
         if (participantLimit != 0) {
             if (participantLimit <= confirmedRequests) {
                 log.error("EventIsNotAvailableException");
-                throw new EntityIsNotAvailableException(String.format("You can't make request to event id: %s because " +
-                        "participant limit is over", eventId));
+                throw ForbiddenException.eventIsNotAvailable(eventId);
             }
         }
         Request request = event.isRequestModeration()
@@ -69,12 +68,11 @@ public class RequestUserService {
         long requesterId = request.getRequesterId();
         if (request.getStatus().equals(RequestStatus.CANCELED)) {
             log.error("UpdateIsForbiddenException");
-            throw new UpdateIsForbiddenException(String.format("Request id: %s can't be updated because " +
-                    "it's already canceled", reqId));
+            throw ForbiddenException.cancelRequest(reqId);
         }
         if (requesterId != userId) {
             log.error("UserIsInitiatorException");
-            throw new UserNotInitiatorException("It's not your request");
+            throw ForbiddenException.userIsNotRequester(userId, reqId);
         }
         request.setStatus(RequestStatus.CANCELED);
         requestRepository.save(request);
@@ -106,13 +104,11 @@ public class RequestUserService {
         Request request = getRequest(reqId);
         if (!requests.contains(request)) {
             log.error("UpdateIsForbiddenException");
-            throw new UpdateIsForbiddenException(String.format("Request id: %s can't be updated because it don't " +
-                    "related to event id: %s", reqId, eventId));
+            throw ForbiddenException.updateRequest(reqId, eventId);
         }
         if (!request.getStatus().equals(RequestStatus.PENDING)) {
             log.error("UpdateIsForbiddenException");
-            throw new UpdateIsForbiddenException(String.format("Request id: %s can't be updated because " +
-                    "it already updated", reqId));
+            throw ForbiddenException.updateUpdatedRequest(reqId);
         }
         if (isApproved) {
             request.setStatus(RequestStatus.CONFIRMED);

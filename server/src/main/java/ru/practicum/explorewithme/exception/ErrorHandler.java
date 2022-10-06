@@ -18,59 +18,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ApiError handleUnrelatedEntitiesException(final CommentingIsForbiddenException e) {
-        return ApiError.builder()
-                .status(HttpStatus.FORBIDDEN)
-                .reason("For the requested operation the conditions are not met.")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-    }
-
-    // Попытка оставить запрос на отмененное или неопубликованное событие
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ApiError handleEventIsNotAvailableException(final EntityIsNotAvailableException e) {
-        return ApiError.builder()
-                .status(HttpStatus.FORBIDDEN)
-                .reason("For the requested operation the conditions are not met.")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-    }
-
-    //Попытка оставить запрос на свое собственное мероприятие
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiError handleUserIsInitiatorException(final UserIsInitiatorException e) {
-        return ApiError.builder()
-                .status(HttpStatus.CONFLICT)
-                .reason("Integrity constraint has been violated")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-    }
-
-    // Попытка обновить чужой запрос или событие
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ApiError handleUserNotInitiatorException(final UserNotInitiatorException e) {
-        return ApiError.builder()
-                .status(HttpStatus.FORBIDDEN)
-                .reason("For the requested operation the conditions are not met.")
-                .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
-                .build();
-    }
-
-    // Попытка обновить уже обновленный объект
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ApiError handleUpdateIsForbiddenException(final UpdateIsForbiddenException e) {
+    public ApiError handleEventIsNotAvailableException(final ForbiddenException e) {
         return ApiError.builder()
                 .status(HttpStatus.FORBIDDEN)
                 .reason("For the requested operation the conditions are not met.")

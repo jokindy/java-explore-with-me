@@ -7,9 +7,8 @@ import ru.practicum.explorewithme.comment.Comment;
 import ru.practicum.explorewithme.comment.CommentModerationStatus;
 import ru.practicum.explorewithme.comment.CommentRepository;
 import ru.practicum.explorewithme.comment.common.CommentPublicService;
-import ru.practicum.explorewithme.exception.UpdateIsForbiddenException;
+import ru.practicum.explorewithme.exception.ForbiddenException;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import static ru.practicum.explorewithme.comment.CommentModerationStatus.*;
@@ -21,20 +20,17 @@ public class CommentAdminService {
 
     private final CommentPublicService commentPublicService;
     private final CommentRepository commentRepository;
-    private final EntityManager entityManager;
 
     @Transactional
     public Comment handleCommentStatus(long commentId, boolean isPublished) {
         log.debug("Changing status for comment id: {}, is published {}", commentId, isPublished);
         Comment comment = commentPublicService.getComment(commentId);
         if (comment.getState() != PENDING) {
-            throw new UpdateIsForbiddenException(String.format("Comment id: %s can't be update because" +
-                    " it's already updated", commentId));
+            throw ForbiddenException.updateCommentStatus(commentId);
         }
         CommentModerationStatus status = isPublished ? APPROVED : REJECTED;
-        commentRepository.updateCommentStatus(commentId, status);
-        entityManager.refresh(comment);
-        return comment;
+        comment.setState(status);
+        return commentRepository.save(comment);
     }
 
     public void deleteComment(long commentId) {

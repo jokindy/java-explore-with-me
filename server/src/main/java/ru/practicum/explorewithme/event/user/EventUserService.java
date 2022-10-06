@@ -13,9 +13,8 @@ import ru.practicum.explorewithme.event.dto.EventFullDto;
 import ru.practicum.explorewithme.event.dto.EventShortDto;
 import ru.practicum.explorewithme.event.dto.NewEventDto;
 import ru.practicum.explorewithme.event.repository.EventRepository;
+import ru.practicum.explorewithme.exception.ForbiddenException;
 import ru.practicum.explorewithme.exception.ModelNotFoundException;
-import ru.practicum.explorewithme.exception.UpdateIsForbiddenException;
-import ru.practicum.explorewithme.exception.UserNotInitiatorException;
 import ru.practicum.explorewithme.user.UserAdminService;
 
 import javax.persistence.EntityManager;
@@ -70,8 +69,7 @@ public class EventUserService {
             long initiatorId = eventOptional.get().getInitiatorId();
             if (userId != initiatorId) {
                 log.error("UserNotInitiatorException");
-                throw new UserNotInitiatorException(String.format("User id: %s is not initiator for event id: %s",
-                        userId, eventId));
+                throw ForbiddenException.userIsNotInitiator(userId, eventId);
             }
             return eventOptional.get();
         } else {
@@ -92,13 +90,11 @@ public class EventUserService {
         Event eventDb = getEventById(event.getId());
         if (eventDb.getInitiatorId() != userId) {
             log.error("UpdateIsForbiddenException");
-            throw new UpdateIsForbiddenException(String.format("Event id: %s can't be update because user id: %s is " +
-                    "not owner", event.getId(), userId));
+            throw ForbiddenException.updateEvent(event.getId(), userId);
         }
         if (!event.getState().equals(PENDING)) {
             log.error("UpdateIsForbiddenException");
-            throw new UpdateIsForbiddenException(String.format("Event id: %s can't be update because it status is: %s",
-                    event.getId(), event.getState()));
+            throw ForbiddenException.updatePublishedEvent(event.getId(), event.getState());
         }
         categoryService.checkCategoryId(event.getCategoryId());
         eventRepository.save(event);
@@ -111,8 +107,7 @@ public class EventUserService {
         Event event = getEventByOwnerId(userId, eventId);
         if (event.getState().equals(CANCELED)) {
             log.error("UpdateIsForbiddenException");
-            throw new UpdateIsForbiddenException(String.format("Event id: %s can't be canceled because it status is: %s",
-                    event.getId(), event.getState()));
+            throw ForbiddenException.cancelEvent(eventId, event.getState());
         }
         eventRepository.cancelEvent(CANCELED, eventId);
         event.setState(CANCELED);

@@ -10,7 +10,7 @@ import org.springframework.test.context.TestPropertySource;
 import ru.practicum.explorewithme.category.Category;
 import ru.practicum.explorewithme.comment.user.CommentUserService;
 import ru.practicum.explorewithme.event.Event;
-import ru.practicum.explorewithme.exception.CommentingIsForbiddenException;
+import ru.practicum.explorewithme.exception.ForbiddenException;
 import ru.practicum.explorewithme.request.Request;
 import ru.practicum.explorewithme.user.User;
 
@@ -36,7 +36,7 @@ public class CommentUserServiceTest {
     public void saveCommentByInitiator() {
         fillDatabase();
         Comment comment = CommentTestEntities.getComment(1, 1);
-        CommentingIsForbiddenException thrown = Assertions.assertThrows(CommentingIsForbiddenException.class,
+        ForbiddenException thrown = Assertions.assertThrows(ForbiddenException.class,
                 () -> service.save(comment, comment.getAuthorId(), comment.getEventId()));
         Assertions.assertEquals("You can't leave comment on your event", thrown.getMessage());
     }
@@ -45,7 +45,7 @@ public class CommentUserServiceTest {
     public void saveWithoutRequest() {
         fillDatabase();
         Comment comment = CommentTestEntities.getComment(2, 1);
-        CommentingIsForbiddenException thrown = Assertions.assertThrows(CommentingIsForbiddenException.class,
+        ForbiddenException thrown = Assertions.assertThrows(ForbiddenException.class,
                 () -> service.save(comment, comment.getAuthorId(), comment.getEventId()));
         Assertions.assertEquals("You can't leave comment on event because you aren't participant",
                 thrown.getMessage());

@@ -7,7 +7,7 @@ import ru.practicum.explorewithme.category.Category;
 import ru.practicum.explorewithme.category.CategoryRepository;
 import ru.practicum.explorewithme.category.common.CategoryPublicService;
 import ru.practicum.explorewithme.category.dto.CategoryDto;
-import ru.practicum.explorewithme.exception.UpdateIsForbiddenException;
+import ru.practicum.explorewithme.exception.ForbiddenException;
 
 @Slf4j
 @Service
@@ -30,7 +30,7 @@ public class CategoryAdminService {
         Category category = CategoryDto.toDomain(get(updatedCategory.getId()));
         if (category.equals(updatedCategory)) {
             log.error("UpdateIsForbiddenException");
-            throw new UpdateIsForbiddenException("Same category");
+            throw ForbiddenException.updateSameCategory(category.getId());
         }
         categoryRepository.save(updatedCategory);
         return CategoryDto.construct(updatedCategory);

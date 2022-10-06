@@ -7,10 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.comment.Comment;
-import ru.practicum.explorewithme.comment.CommentRepository;
 import ru.practicum.explorewithme.comment.CommentModerationStatus;
-import ru.practicum.explorewithme.exception.CommentingIsForbiddenException;
-import ru.practicum.explorewithme.exception.EntityIsNotAvailableException;
+import ru.practicum.explorewithme.comment.CommentRepository;
+import ru.practicum.explorewithme.exception.ForbiddenException;
 import ru.practicum.explorewithme.exception.ModelNotFoundException;
 
 import java.util.List;
@@ -44,11 +43,10 @@ public class CommentPublicService {
         log.debug("Getting event id: {}'s comment id: {}", eventId, commentId);
         Comment comment = getComment(commentId);
         if (comment.getEventId() != eventId) {
-            throw new CommentingIsForbiddenException(String.format("Comment id: %s isn't for event id: %s",
-                    commentId, eventId));
+            throw ForbiddenException.commentForAnotherEvent(commentId, eventId);
         }
         if (!comment.getState().equals(CommentModerationStatus.APPROVED)) {
-            throw new EntityIsNotAvailableException(String.format("Comment id: %s is not published yet", commentId));
+            throw ForbiddenException.commentIsNotAvailable(commentId);
         }
         return comment;
     }
