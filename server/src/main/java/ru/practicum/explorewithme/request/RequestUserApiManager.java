@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class RequestUserManager {
+public class RequestUserApiManager {
 
     private final RequestUserService requestUserService;
 

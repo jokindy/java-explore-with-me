@@ -8,7 +8,7 @@ import ru.practicum.explorewithme.util.Mapper;
 
 @Service
 @AllArgsConstructor
-public class CategoryAdminManager {
+public class CategoryAdminApiManager {
 
     private final Mapper mapper;
     private final CategoryAdminService categoryService;

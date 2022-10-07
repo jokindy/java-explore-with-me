@@ -13,19 +13,19 @@ import java.util.List;
 @AllArgsConstructor
 public class CompilationPublicController {
 
-    private final CompilationPublicManager compilationPublicManager;
+    private final CompilationPublicApiManager compilationPublicApiManager;
 
     @GetMapping
     public List<CompilationDto> getCompilations(@RequestParam(required = false) boolean pinned,
                                                 @RequestParam(defaultValue = "0") int from,
                                                 @RequestParam(defaultValue = "10") int size) {
         log.debug("Getting compilations by pin: {}", pinned);
-        return compilationPublicManager.getCompilations(pinned, from, size);
+        return compilationPublicApiManager.getCompilations(pinned, from, size);
     }
 
     @GetMapping("/{compId}")
     public CompilationDto getCompilationById(@PathVariable long compId) {
         log.debug("Getting compilation id: {}", compId);
-        return compilationPublicManager.getCompilationById(compId);
+        return compilationPublicApiManager.getCompilationById(compId);
     }
 }

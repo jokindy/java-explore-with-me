@@ -16,18 +16,18 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryPublicController {
 
-    private final CategoryPublicManager categoryPublicManager;
+    private final CategoryPublicApiManager categoryPublicApiManager;
 
     @GetMapping
     public List<CategoryDto> getCategories(@Valid @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                            @Valid @Positive @RequestParam(defaultValue = "10") int size) {
         log.debug("Getting categories");
-        return categoryPublicManager.getCategories(from, size);
+        return categoryPublicApiManager.getCategories(from, size);
     }
 
     @GetMapping("/{catId}")
     public CategoryDto getCategoryById(@PathVariable long catId) {
         log.debug("Getting category id: {}", catId);
-        return categoryPublicManager.getCategoryById(catId);
+        return categoryPublicApiManager.getCategoryById(catId);
     }
 }

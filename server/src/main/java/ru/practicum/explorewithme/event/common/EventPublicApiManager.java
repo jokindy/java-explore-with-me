@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class EventPublicManager {
+public class EventPublicApiManager {
 
     private final EventMapper eventMapper;
     private final EventClient eventClient;
@@ -26,7 +26,7 @@ public class EventPublicManager {
                                          LocalDateTime rangeStart,
                                          LocalDateTime rangeEnd,
                                          boolean onlyAvailable,
-                                         EventSort sort,
+                                         EventSortKey sort,
                                          int from,
                                          int size) {
         List<Event> events = eventPublicService.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable);

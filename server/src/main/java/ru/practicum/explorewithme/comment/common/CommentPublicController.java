@@ -21,7 +21,7 @@ public class CommentPublicController {
     /**
      * Метод возвращает только опубликованные комменты к событию с сортировкой по полезности или дате
      */
-    
+
     @GetMapping("/{eventId}/comments")
     public List<CommentDto> getEventComments(@PathVariable long eventId,
                                              @RequestParam(defaultValue = "DEFAULT") CommentSortKey sort,

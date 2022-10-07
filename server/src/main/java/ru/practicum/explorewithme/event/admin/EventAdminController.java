@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 public class EventAdminController {
 
-    private final EventAdminManager eventAdminManager;
+    private final EventAdminApiManager eventAdminApiManager;
 
     @GetMapping
     public List<EventFullDto> getEvents(@RequestParam(required = false) Long[] users,
@@ -33,25 +33,25 @@ public class EventAdminController {
                                         @Valid @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                         @Valid @Positive @RequestParam(defaultValue = "10") int size) {
         log.debug("Get events");
-        return eventAdminManager.getEvents(users, states, categories, rangeStart, rangeEnd, from, size);
+        return eventAdminApiManager.getEvents(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PutMapping("/{eventId}")
     public EventFullDto putEvent(@RequestBody AdminUpdateEventDto eventDto, @PathVariable long eventId) {
         log.debug("Update event id: {}, DTO - {}", eventId, eventDto);
-        return eventAdminManager.putEvent(eventDto, eventId);
+        return eventAdminApiManager.putEvent(eventDto, eventId);
     }
 
     @PatchMapping("/{eventId}/publish")
     public EventFullDto publishEvent(@PathVariable long eventId) {
         log.debug("Publish event id: {}", eventId);
-        return eventAdminManager.handleEventState(eventId, true);
+        return eventAdminApiManager.handleEventState(eventId, true);
 
     }
 
     @PatchMapping("/{eventId}/reject")
     public EventFullDto rejectEvent(@PathVariable long eventId) {
         log.debug("Reject event id: {}", eventId);
-        return eventAdminManager.handleEventState(eventId, false);
+        return eventAdminApiManager.handleEventState(eventId, false);
     }
 }

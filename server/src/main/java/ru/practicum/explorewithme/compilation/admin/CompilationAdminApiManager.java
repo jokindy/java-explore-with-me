@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class CompilationAdminManager {
+public class CompilationAdminApiManager {
 
     private final Mapper mapper;
     private final CompilationAdminService compilationAdminService;

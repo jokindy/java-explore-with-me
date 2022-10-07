@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class EventAdminManager {
+public class EventAdminApiManager {
 
     private final EventMapper eventMapper;
     private final EventClient eventClient;

@@ -1,6 +1,6 @@
 package ru.practicum.explorewithme.event.common;
 
-public enum EventSort {
+public enum EventSortKey {
     EVENT_DATE,
     VIEWS
 }

@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class CompilationPublicManager {
+public class CompilationPublicApiManager {
 
     private final Mapper mapper;
     private final CompilationPublicService compilationPublicService;

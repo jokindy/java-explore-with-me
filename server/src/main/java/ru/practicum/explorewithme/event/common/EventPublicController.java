@@ -22,7 +22,7 @@ import java.util.List;
 public class EventPublicController {
 
     private final EventClient client;
-    private final EventPublicManager eventPublicManager;
+    private final EventPublicApiManager eventPublicApiManager;
 
     @GetMapping
     public List<EventShortDto> getEvents(@RequestParam(required = false) String text,
@@ -33,20 +33,20 @@ public class EventPublicController {
                                          @RequestParam(required = false)
                                          @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                          @RequestParam(defaultValue = "false") boolean onlyAvailable,
-                                         @RequestParam(required = false) EventSort sort,
+                                         @RequestParam(required = false) EventSortKey sort,
                                          @Valid @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                          @Valid @Positive @RequestParam(defaultValue = "10") int size,
                                          HttpServletRequest request) {
         log.debug("Get events");
         client.addRequest(request);
-        return eventPublicManager.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        return eventPublicApiManager.getEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
 
     }
 
     @GetMapping("/{eventId}")
     public EventFullDto getEventById(@PathVariable long eventId, HttpServletRequest request) {
         log.debug("Get event id: {}", eventId);
-        EventFullDto dto = eventPublicManager.getEventById(eventId);
+        EventFullDto dto = eventPublicApiManager.getEventById(eventId);
         client.addRequest(request);
         return dto;
     }

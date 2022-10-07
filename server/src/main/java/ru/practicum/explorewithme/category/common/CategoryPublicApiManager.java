@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class CategoryPublicManager {
+public class CategoryPublicApiManager {
 
     private final Mapper mapper;
     private final CategoryPublicService categoryPublicService;

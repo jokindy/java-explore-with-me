@@ -13,24 +13,24 @@ import javax.validation.Valid;
 @AllArgsConstructor
 public class CategoryAdminController {
 
-    private final CategoryAdminManager categoryAdminManager;
+    private final CategoryAdminApiManager categoryAdminApiManager;
 
     @PostMapping
     public CategoryDto postCategory(@Valid @RequestBody CategoryDto categoryDto) {
         log.debug("Saving new category to DB");
-        return categoryAdminManager.postCategory(categoryDto);
+        return categoryAdminApiManager.postCategory(categoryDto);
     }
 
     @PatchMapping
     public CategoryDto patchCategory(@Valid @RequestBody CategoryDto categoryDto) {
         log.debug("Updating category id: {}", categoryDto.getId());
-        return categoryAdminManager.patchCategory(categoryDto);
+        return categoryAdminApiManager.patchCategory(categoryDto);
     }
 
     @DeleteMapping("/{catId}")
     public String deleteCategory(@PathVariable long catId) {
         log.debug("Deleting category id: {}", catId);
-        categoryAdminManager.deleteCategory(catId);
+        categoryAdminApiManager.deleteCategory(catId);
         return String.format("Category id: %s is deleted", catId);
     }
 }
