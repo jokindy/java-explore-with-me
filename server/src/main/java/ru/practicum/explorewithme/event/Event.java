@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
 import ru.practicum.explorewithme.category.Category;
+import ru.practicum.explorewithme.comment.Comment;
 import ru.practicum.explorewithme.compilation.Compilation;
 import ru.practicum.explorewithme.request.Request;
 import ru.practicum.explorewithme.request.RequestStatus;
@@ -16,7 +17,6 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -77,11 +77,16 @@ public class Event {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     @ToString.Exclude
+    private List<Comment> comments;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_id")
+    @ToString.Exclude
     private List<Request> requests;
 
     @ManyToMany(mappedBy = "events")
     @ToString.Exclude
-    private Set<Compilation> compilations;
+    private List<Compilation> compilations;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "initiator_id", insertable = false, updatable = false, nullable = false)

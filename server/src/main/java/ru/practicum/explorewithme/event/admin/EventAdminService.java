@@ -8,7 +8,7 @@ import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.event.common.EventPublicService;
 import ru.practicum.explorewithme.event.dto.AdminUpdateEventDto;
 import ru.practicum.explorewithme.event.repository.EventRepository;
-import ru.practicum.explorewithme.exception.UpdateIsForbiddenException;
+import ru.practicum.explorewithme.exception.ForbiddenException;
 import ru.practicum.explorewithme.util.Mapper;
 
 import javax.transaction.Transactional;
@@ -52,7 +52,7 @@ public class EventAdminService {
         Event event = eventPublicService.getEvent(eventId);
         if (!event.getState().equals(EventState.PENDING)) {
             log.error("UpdateIsForbiddenException");
-            throw new UpdateIsForbiddenException(String.format("Event id: %s is already updated", eventId));
+            throw ForbiddenException.updateEventState(eventId);
         }
         if (isPublish) {
             event.setState(EventState.PUBLISHED);

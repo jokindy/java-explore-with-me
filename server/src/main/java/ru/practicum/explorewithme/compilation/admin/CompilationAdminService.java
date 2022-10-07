@@ -8,7 +8,7 @@ import ru.practicum.explorewithme.compilation.CompilationRepository;
 import ru.practicum.explorewithme.compilation.common.CompilationPublicService;
 import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.user.EventUserService;
-import ru.practicum.explorewithme.exception.UpdateIsForbiddenException;
+import ru.practicum.explorewithme.exception.ForbiddenException;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -66,14 +66,14 @@ public class CompilationAdminService {
                 compilationRepository.setCompilationPinned(false, compId);
             } else {
                 log.error("UpdateIsForbiddenException");
-                throw new UpdateIsForbiddenException(String.format("Compilation id: %s is already unpinned", compId));
+                throw ForbiddenException.updateUnpinnedCompilation(compId);
             }
         } else {
             if (!pinned) {
                 compilationRepository.setCompilationPinned(true, compId);
             } else {
                 log.error("UpdateIsForbiddenException");
-                throw new UpdateIsForbiddenException(String.format("Compilation id: %s is already pinned", compId));
+                throw ForbiddenException.updatePinnedCompilation(compId);
             }
         }
     }

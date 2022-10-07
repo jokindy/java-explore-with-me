@@ -7,9 +7,9 @@ import lombok.Setter;
 @Setter
 public class ModelNotFoundException extends RuntimeException {
 
-    private String message;
+    private final String message;
 
     public ModelNotFoundException(long id, String className) {
-        this.message = String.format("%s id=%s not found", className, id);
+        this.message = String.format("%s id: %s not found", className, id);
     }
 }
