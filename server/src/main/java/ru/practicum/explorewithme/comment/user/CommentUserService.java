@@ -2,12 +2,12 @@ package ru.practicum.explorewithme.comment.user;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.comment.Comment;
 import ru.practicum.explorewithme.comment.CommentModerationStatus;
 import ru.practicum.explorewithme.comment.CommentRepository;
 import ru.practicum.explorewithme.comment.common.CommentPublicService;
+import ru.practicum.explorewithme.comment.rating.CommentRatingService;
 import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.event.user.EventUserService;
@@ -32,6 +32,7 @@ public class CommentUserService {
     private final EventUserService eventService;
     private final RequestUserService requestUserService;
     private final CommentRepository commentRepository;
+    private final CommentRatingService commentRatingService;
     private final CommentPublicService commentPublicService;
 
     @Transactional
@@ -81,12 +82,7 @@ public class CommentUserService {
             log.error("CommentingIsForbiddenException");
             throw ForbiddenException.rateOwnComment();
         }
-        try {
-            commentRepository.rateComment(commentId, userId, isLike);
-        } catch (DataIntegrityViolationException e) {
-            log.error("CommentingIsForbiddenException");
-            throw ForbiddenException.rateTwice(commentId);
-        }
+        commentRatingService.saveRate(userId, commentId, isLike);
     }
 
     private void checkIds(long userId, long eventId) {

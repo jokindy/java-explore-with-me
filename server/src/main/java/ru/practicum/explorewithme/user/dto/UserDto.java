@@ -26,18 +26,4 @@ public class UserDto {
     @NotBlank(groups = BasicInfo.class)
     @NotNull(groups = BasicInfo.class)
     private String name;
-
-    public static UserDto construct(User user) {
-        return new UserDto(user.getId(),
-                user.getEmail(),
-                user.getName());
-    }
-
-    public static User toDomain(UserDto dto) {
-        User user = new User();
-        user.setId(dto.getId());
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        return user;
-    }
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.explorewithme.comment.CommentRating;
+import ru.practicum.explorewithme.comment.rating.CommentRating;
 import ru.practicum.explorewithme.comment.CommentModerationStatus;
 import ru.practicum.explorewithme.event.dto.EventCommentDto;
 import ru.practicum.explorewithme.user.dto.UserShortDto;

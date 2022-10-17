@@ -7,6 +7,7 @@ import ru.practicum.explorewithme.comment.common.CommentPublicService;
 import ru.practicum.explorewithme.comment.dto.CommentDto;
 import ru.practicum.explorewithme.comment.dto.NewCommentDto;
 import ru.practicum.explorewithme.comment.dto.UpdateCommentDto;
+import ru.practicum.explorewithme.comment.rating.CommentRatingService;
 import ru.practicum.explorewithme.util.Mapper;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class CommentUserApiManager {
     private final Mapper mapper;
     private final CommentUserService commentUserService;
     private final CommentPublicService commentPublicService;
+    private final CommentRatingService commentRatingService;
 
     public List<CommentDto> getEventComments(long userId, long eventId) {
         List<Comment> comments = commentUserService.getEventComments(userId, eventId);
@@ -46,5 +48,9 @@ public class CommentUserApiManager {
 
     public void handleLike(long userId, long eventId, long commentId, boolean isLike) {
         commentUserService.handleLike(userId, eventId, commentId, isLike);
+    }
+
+    public void deleteRate(long userId, long commentId) {
+        commentRatingService.deleteRate(userId, commentId);
     }
 }

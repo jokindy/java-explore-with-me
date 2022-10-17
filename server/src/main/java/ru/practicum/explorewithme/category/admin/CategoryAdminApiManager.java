@@ -17,7 +17,6 @@ public class CategoryAdminApiManager {
         Category category = mapper.map(categoryDto, Category.class);
         categoryService.save(category);
         return mapper.map(category, CategoryDto.class);
-
     }
 
     public CategoryDto patchCategory(CategoryDto categoryDto) {
