@@ -91,4 +91,13 @@ public class CommentUserController {
         commentUserApiManager.handleLike(userId, eventId, commentId, false);
         return String.format("You add dislike to comment id: %s", commentId);
     }
+
+    @DeleteMapping("/{userId}/events/{eventId}/comments/{commentId}/like")
+    public String deleteLike(@PathVariable long userId,
+                             @PathVariable long eventId,
+                             @PathVariable long commentId) {
+        log.debug("Delete rate for event id: {}'s comment id: {}", eventId, commentId);
+        commentUserApiManager.deleteRate(userId, commentId);
+        return String.format("You delete like from comment id: %s", commentId);
+    }
 }

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import ru.practicum.explorewithme.comment.rating.CommentRating;
 import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.user.User;
 
@@ -55,8 +56,9 @@ public class Comment {
     @ToString.Exclude
     private Event event;
 
-    @ElementCollection
-    @CollectionTable(name = "comment_rating", joinColumns = @JoinColumn(name = "comment_id"))
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id")
+    @ToString.Exclude
     private Set<CommentRating> commentRatings;
 
     @Override
