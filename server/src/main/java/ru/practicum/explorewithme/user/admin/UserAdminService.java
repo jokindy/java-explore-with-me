@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.user;
+package ru.practicum.explorewithme.user.admin;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.exception.ModelNotFoundException;
+import ru.practicum.explorewithme.user.User;
+import ru.practicum.explorewithme.user.UserRepository;
 
 import java.util.List;
 

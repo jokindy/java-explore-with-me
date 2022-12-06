@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.user;
+package ru.practicum.explorewithme.user.admin;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,26 +19,26 @@ import java.util.List;
 @AllArgsConstructor
 public class UserAdminController {
 
-    private final UserAdminManager userAdminManager;
+    private final UserAdminApiManager userAdminApiManager;
 
     @GetMapping
     public List<UserDto> getUsers(@RequestParam(required = false) Long[] ids,
                                   @Valid @PositiveOrZero @RequestParam(defaultValue = "0") int from,
                                   @Valid @Positive @RequestParam(defaultValue = "10") int size) {
         log.info("Getting users id: {}", (Object) ids);
-        return userAdminManager.getUsers(ids, from, size);
+        return userAdminApiManager.getUsers(ids, from, size);
     }
 
     @PostMapping
     public UserDto saveUser(@Validated(BasicInfo.class) @RequestBody UserDto userDto) {
         log.debug("Saving new user: {}", userDto);
-        return userAdminManager.saveUser(userDto);
+        return userAdminApiManager.saveUser(userDto);
     }
 
     @DeleteMapping("/{userId}")
     public String deleteUser(@PathVariable long userId) {
         log.debug("Deleting user id: {}", userId);
-        userAdminManager.deleteUser(userId);
+        userAdminApiManager.deleteUser(userId);
         return String.format("User id: %s is deleted", userId);
     }
 }

@@ -11,7 +11,7 @@ import ru.practicum.explorewithme.event.common.EventPublicService;
 import ru.practicum.explorewithme.event.repository.EventRepository;
 import ru.practicum.explorewithme.exception.ForbiddenException;
 import ru.practicum.explorewithme.exception.ModelNotFoundException;
-import ru.practicum.explorewithme.user.UserAdminService;
+import ru.practicum.explorewithme.user.admin.UserAdminService;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;

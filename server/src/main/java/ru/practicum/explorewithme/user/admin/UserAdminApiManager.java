@@ -1,7 +1,8 @@
-package ru.practicum.explorewithme.user;
+package ru.practicum.explorewithme.user.admin;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.explorewithme.user.User;
 import ru.practicum.explorewithme.user.dto.UserDto;
 import ru.practicum.explorewithme.util.Mapper;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class UserAdminManager {
+public class UserAdminApiManager {
 
     private final Mapper mapper;
     private final UserAdminService userAdminService;

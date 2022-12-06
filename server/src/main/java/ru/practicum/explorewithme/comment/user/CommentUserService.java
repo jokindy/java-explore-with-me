@@ -15,7 +15,7 @@ import ru.practicum.explorewithme.exception.ForbiddenException;
 import ru.practicum.explorewithme.request.Request;
 import ru.practicum.explorewithme.request.RequestStatus;
 import ru.practicum.explorewithme.request.RequestUserService;
-import ru.practicum.explorewithme.user.UserAdminService;
+import ru.practicum.explorewithme.user.admin.UserAdminService;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
