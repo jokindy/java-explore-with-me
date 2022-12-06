@@ -8,7 +8,7 @@ import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.event.user.EventUserService;
 import ru.practicum.explorewithme.exception.ForbiddenException;
 import ru.practicum.explorewithme.exception.ModelNotFoundException;
-import ru.practicum.explorewithme.user.UserAdminService;
+import ru.practicum.explorewithme.user.admin.UserAdminService;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;

@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.explorewithme.category.dto.CategoryDto;
-import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.event.EventState;
 import ru.practicum.explorewithme.user.dto.UserShortDto;
 
@@ -40,23 +39,4 @@ public class EventFullDto {
     private EventState state;
     private String title;
     private int views;
-
-    public static EventFullDto construct(Event event, int views) {
-        return new EventFullDto(event.getId(),
-                event.getAnnotation(),
-                event.getDescription(),
-                event.getCreatedOn(),
-                event.getEventDate(),
-                LocationDto.construct(event.getLocation()),
-                event.getConfirmedRequests(),
-                CategoryDto.construct(event.getCategory()),
-                UserShortDto.construct(event.getInitiator()),
-                event.isPaid(),
-                event.getParticipantLimit(),
-                event.getPublishedOn(),
-                event.isRequestModeration(),
-                event.getState(),
-                event.getTitle(),
-                views);
-    }
 }

@@ -10,6 +10,7 @@ import ru.practicum.explorewithme.user.dto.validation.ValidEmail;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -26,4 +27,6 @@ public class UserDto {
     @NotBlank(groups = BasicInfo.class)
     @NotNull(groups = BasicInfo.class)
     private String name;
+
+    private List<UserShortDto> subscribers;
 }

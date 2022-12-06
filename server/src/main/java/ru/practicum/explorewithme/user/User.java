@@ -5,11 +5,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.WhereJoinTable;
 import ru.practicum.explorewithme.event.Event;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -31,7 +32,16 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "initiator_id")
     @ToString.Exclude
-    private Set<Event> events;
+    private List<Event> events;
+
+    @ManyToMany
+    @JoinTable(
+            name = "subscribers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "subscriber_id"))
+    @WhereJoinTable(clause = "status = 'APPROVED'")
+    @ToString.Exclude
+    private List<User> subscribers;
 
     @Override
     public boolean equals(Object o) {

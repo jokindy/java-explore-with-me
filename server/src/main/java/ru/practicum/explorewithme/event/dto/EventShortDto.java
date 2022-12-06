@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.explorewithme.category.dto.CategoryDto;
-import ru.practicum.explorewithme.event.Event;
 import ru.practicum.explorewithme.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
@@ -27,16 +26,4 @@ public class EventShortDto {
     private boolean paid;
     private String title;
     private Integer views;
-
-    public static EventShortDto construct(Event event, int views) {
-        return new EventShortDto(event.getId(),
-                event.getAnnotation(),
-                CategoryDto.construct(event.getCategory()),
-                event.getConfirmedRequests(),
-                event.getEventDate(),
-                UserShortDto.construct(event.getInitiator()),
-                event.isPaid(),
-                event.getTitle(),
-                views);
-    }
 }
