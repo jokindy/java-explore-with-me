@@ -20,7 +20,7 @@ public class CommentAdminController {
     @PatchMapping("/{commentId}/publish")
     public CommentDto publishComment(@PathVariable long commentId) {
         log.debug("Publish comment id: {}", commentId);
-       return commentAdminApiManager.handleCommentStatus(commentId, true);
+        return commentAdminApiManager.handleCommentStatus(commentId, true);
     }
 
     /**
